@@ -1,0 +1,26 @@
+# EstateFlow Control - Docker Compose Infrastructure (Phase 4, Section 44)
+services:
+  estateflow-automation-engine:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: estateflow_automation_engine
+    restart: unless-stopped
+    ports:
+      - "8088:8088"
+    environment:
+      - PORT=8088
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8088/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    volumes:
+      - estateflow-logs:/app/logs
+
+volumes:
+  estateflow-logs:
+    driver: local
