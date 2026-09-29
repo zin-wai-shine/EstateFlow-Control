@@ -18,20 +18,25 @@ fn open_native_chrome(profile_dir: String, url: Option<String>) -> Result<String
     data_dir.push(&profile_dir);
 
     let _ = std::fs::create_dir_all(&data_dir);
-    let target_url = url.unwrap_or_else(|| "https://chatgpt.com".to_string());
 
     #[cfg(target_os = "macos")]
     {
-        let res = Command::new("/usr/bin/open")
-            .arg("-na")
+        let mut cmd = Command::new("/usr/bin/open");
+        cmd.arg("-na")
             .arg("Google Chrome")
             .arg("--args")
-            .arg(format!("--user-data-dir={}", data_dir.display()))
-            .arg(&target_url)
-            .spawn();
+            .arg(format!("--user-data-dir={}", data_dir.display()));
+
+        if let Some(ref u) = url {
+            if !u.trim().is_empty() {
+                cmd.arg(u);
+            }
+        }
+
+        let res = cmd.spawn();
 
         match res {
-            Ok(_) => Ok(format!("Opened Chrome profile at {} with {}", data_dir.display(), target_url)),
+            Ok(_) => Ok(format!("Opened Chrome profile at {}", data_dir.display())),
             Err(e) => Err(format!("Failed to launch Google Chrome: {}", e)),
         }
     }
