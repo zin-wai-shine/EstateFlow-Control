@@ -54,7 +54,7 @@ export const ActivityHistory: React.FC = () => {
 
       {activeTab === 'human' ? (
         /* Human Readable Activity Timeline (Section 50) */
-        <div className="glass-panel p-6 rounded-3xl border border-white/10 space-y-4">
+        <div className="glass-panel p-6 space-y-4">
           <div className="space-y-4">
             {activities.length === 0 ? (
               <p className="text-xs text-neutral-400 text-center py-8">
@@ -62,7 +62,7 @@ export const ActivityHistory: React.FC = () => {
               </p>
             ) : (
               activities.map((act) => (
-                <div key={act.id} className="flex items-start gap-4 p-3.5 rounded-2xl bg-neutral-200/50 dark:bg-white/5 border border-neutral-300/40 dark:border-white/5">
+                <div key={act.id} className="flex items-start gap-4 p-3.5 rounded-xl bg-neutral-100 dark:bg-neutral-800/60 border border-neutral-200 dark:border-neutral-800">
                   <div className={`p-2 rounded-xl shrink-0 ${
                     act.severity === 'success' 
                       ? 'bg-emerald-500/10 text-emerald-400' 
@@ -106,14 +106,14 @@ export const ActivityHistory: React.FC = () => {
         </div>
       ) : (
         /* Technical Logs (Section 51) */
-        <div className="glass-panel p-6 rounded-3xl border border-white/10 font-mono text-xs space-y-3">
-          <div className="text-[11px] text-neutral-400 pb-2 border-b border-white/5">
+        <div className="glass-panel p-6 font-mono text-xs space-y-3">
+          <div className="text-[11px] text-neutral-400 pb-2 border-b border-neutral-200 dark:border-neutral-800">
             Log Rotation Active • Rotating at 1,000 records • Zero sensitive credentials logged
           </div>
 
           <div className="space-y-2">
             {techLogs.map((log) => (
-              <div key={log.id} className="p-2.5 rounded-xl bg-black/40 border border-white/5 text-[11px] leading-relaxed">
+              <div key={log.id} className="p-2.5 rounded-lg bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-[11px] leading-relaxed">
                 <span className="text-neutral-500">{new Date(log.timestamp).toISOString()}</span>
                 {' '}<span className="text-rose-400 font-bold">[{log.serviceName}]</span>
                 {' '}<span className="text-emerald-400">{log.action}</span>: {log.details}

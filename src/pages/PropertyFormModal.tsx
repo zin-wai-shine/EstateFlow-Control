@@ -126,32 +126,32 @@ export const PropertyFormModal: React.FC<PropertyFormModalProps> = ({
     >
       <div className="space-y-5">
         {/* Navigation Tabs inside Form */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 text-xs">
+        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-xs">
           <button
             type="button"
             onClick={() => setActiveTab('basics')}
-            className={`flex-1 py-1.5 rounded-lg font-medium transition-colors ${activeTab === 'basics' ? 'bg-white dark:bg-neutral-800 text-rose-500 shadow-sm' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'}`}
+            className={`flex-1 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${activeTab === 'basics' ? 'bg-white dark:bg-neutral-700 text-rose-500 shadow-sm' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'}`}
           >
             1. Basics & Location
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('specs')}
-            className={`flex-1 py-1.5 rounded-lg font-medium transition-colors ${activeTab === 'specs' ? 'bg-white dark:bg-neutral-800 text-rose-500 shadow-sm' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'}`}
+            className={`flex-1 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${activeTab === 'specs' ? 'bg-white dark:bg-neutral-700 text-rose-500 shadow-sm' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'}`}
           >
             2. Specs & Equipment
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('pricing')}
-            className={`flex-1 py-1.5 rounded-lg font-medium transition-colors ${activeTab === 'pricing' ? 'bg-white dark:bg-neutral-800 text-rose-500 shadow-sm' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'}`}
+            className={`flex-1 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${activeTab === 'pricing' ? 'bg-white dark:bg-neutral-700 text-rose-500 shadow-sm' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'}`}
           >
             3. Pricing & Terms
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('terms')}
-            className={`flex-1 py-1.5 rounded-lg font-medium transition-colors ${activeTab === 'terms' ? 'bg-white dark:bg-neutral-800 text-rose-500 shadow-sm' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'}`}
+            className={`flex-1 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${activeTab === 'terms' ? 'bg-white dark:bg-neutral-700 text-rose-500 shadow-sm' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'}`}
           >
             4. Description & Notes
           </button>
@@ -494,11 +494,11 @@ export const PropertyFormModal: React.FC<PropertyFormModalProps> = ({
         )}
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between pt-3 border-t border-neutral-200 dark:border-white/10 text-xs">
+        <div className="flex items-center justify-between pt-3 border-t border-neutral-200 dark:border-neutral-800 text-xs">
           <button
             type="button"
             onClick={() => handleSave('draft')}
-            className="px-3.5 py-2 rounded-lg bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 font-medium transition-colors cursor-pointer"
+            className="btn-secondary"
           >
             Save Draft
           </button>
@@ -507,14 +507,14 @@ export const PropertyFormModal: React.FC<PropertyFormModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-3.5 py-2 rounded-lg text-neutral-500 hover:text-neutral-800 dark:hover:text-white cursor-pointer"
+              className="btn-secondary"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={() => handleSave('available')}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-lg btn-primary-red font-medium cursor-pointer"
+              className="btn-primary-red"
             >
               <FiCheck className="w-4 h-4" />
               <span>Save & Open Workspace</span>

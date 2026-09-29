@@ -39,7 +39,7 @@ export const SystemHealth: React.FC = () => {
 
         <button
           onClick={refreshHealth}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 text-xs font-medium transition-colors cursor-pointer"
+          className="btn-secondary"
         >
           <FiRefreshCw className="w-3.5 h-3.5 text-rose-500" />
           <span>Refresh Telemetry</span>
@@ -64,7 +64,7 @@ export const SystemHealth: React.FC = () => {
               {health?.desktopApp.message || 'Tauri 2 macOS desktop container running smoothly'}
             </p>
           </div>
-          <div className="text-[11px] text-neutral-400 pt-2 border-t border-neutral-100 dark:border-white/5">
+          <div className="text-[11px] text-neutral-400 pt-2 border-t border-neutral-200 dark:border-neutral-800">
             Architecture: Apple Silicon ARM64 • Memory safe
           </div>
         </GlassCard>
@@ -85,7 +85,7 @@ export const SystemHealth: React.FC = () => {
               {health?.database.message || 'Schema v2 Active • Transactions safe'}
             </p>
           </div>
-          <div className="text-[11px] text-neutral-400 pt-2 border-t border-neutral-100 dark:border-white/5 flex justify-between items-center">
+          <div className="text-[11px] text-neutral-400 pt-2 border-t border-neutral-200 dark:border-neutral-800 flex justify-between items-center">
             <span>Schema Version: 2</span>
             <button
               onClick={() => handleRestart('SQLite Storage Engine')}
@@ -112,7 +112,7 @@ export const SystemHealth: React.FC = () => {
               {health?.dockerDesktop.message || 'Supporting automation containers online'}
             </p>
           </div>
-          <div className="text-[11px] text-neutral-400 pt-2 border-t border-neutral-100 dark:border-white/5 flex justify-between items-center">
+          <div className="text-[11px] text-neutral-400 pt-2 border-t border-neutral-200 dark:border-neutral-800 flex justify-between items-center">
             <span>Docker Compose v2</span>
             <button
               onClick={() => handleRestart('Docker Automation Containers')}
@@ -140,7 +140,7 @@ export const SystemHealth: React.FC = () => {
               {health?.automationBackend.message || 'Internal job worker and event loop polling'}
             </p>
           </div>
-          <div className="text-[11px] text-neutral-400 pt-2 border-t border-neutral-100 dark:border-white/5 flex justify-between items-center">
+          <div className="text-[11px] text-neutral-400 pt-2 border-t border-neutral-200 dark:border-neutral-800 flex justify-between items-center">
             <span>Status: Polling (1.5s)</span>
             <button
               onClick={() => handleRestart('Automation Engine')}
@@ -168,7 +168,7 @@ export const SystemHealth: React.FC = () => {
               {health?.openClaw.message || 'OpenClaw browser automation bridge responsive'}
             </p>
           </div>
-          <div className="text-[11px] text-neutral-400 pt-2 border-t border-neutral-100 dark:border-white/5 flex justify-between items-center">
+          <div className="text-[11px] text-neutral-400 pt-2 border-t border-neutral-200 dark:border-neutral-800 flex justify-between items-center">
             <span>Port 9222</span>
             <button
               onClick={() => handleRestart('OpenClaw Bridge')}
@@ -195,7 +195,7 @@ export const SystemHealth: React.FC = () => {
               {health?.fileStorage.rootPath}
             </p>
           </div>
-          <div className="text-[11px] text-neutral-400 pt-2 border-t border-neutral-100 dark:border-white/5">
+          <div className="text-[11px] text-neutral-400 pt-2 border-t border-neutral-200 dark:border-neutral-800">
             {health?.fileStorage.freeSpace}
           </div>
         </GlassCard>

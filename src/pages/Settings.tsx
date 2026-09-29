@@ -91,7 +91,7 @@ export const Settings: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1.5 border-b border-neutral-200 dark:border-white/10 pb-2 overflow-x-auto text-xs font-medium">
+      <div className="flex items-center gap-1.5 border-b border-neutral-200 dark:border-neutral-800 pb-2 overflow-x-auto text-xs font-medium">
         {[
           { id: 'general', label: 'General & Storage' },
           { id: 'appearance', label: 'Appearance & Themes' },
@@ -106,7 +106,7 @@ export const Settings: React.FC = () => {
             className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
               activeTab === tab.id
                 ? 'bg-rose-500/10 text-rose-500 dark:text-rose-400 font-semibold border border-rose-500/20'
-                : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/5'
+                : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800'
             }`}
           >
             {tab.label}
@@ -116,7 +116,7 @@ export const Settings: React.FC = () => {
 
       {/* Tab: General & Storage */}
       {activeTab === 'general' && (
-        <div className="glass-panel p-5 rounded-2xl border border-neutral-200 dark:border-white/10 space-y-4">
+        <div className="glass-panel p-5 space-y-4">
           <div>
             <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1">
               Root Storage Directory
@@ -130,7 +130,7 @@ export const Settings: React.FC = () => {
               />
               <button
                 onClick={handleSaveAutomation}
-                className="px-3.5 py-2 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
+                className="btn-primary-red"
               >
                 Save
               </button>
@@ -140,7 +140,7 @@ export const Settings: React.FC = () => {
             </p>
           </div>
 
-          <div className="pt-3 border-t border-neutral-100 dark:border-white/5 space-y-2">
+          <div className="pt-3 border-t border-neutral-200 dark:border-neutral-800 space-y-2">
             <label className="flex items-center gap-2 cursor-pointer text-xs font-medium">
               <input
                 type="checkbox"
@@ -162,7 +162,7 @@ export const Settings: React.FC = () => {
 
       {/* Tab: Appearance */}
       {activeTab === 'appearance' && (
-        <div className="glass-panel p-5 rounded-2xl border border-neutral-200 dark:border-white/10 space-y-4">
+        <div className="glass-panel p-5 space-y-4">
           <div>
             <h3 className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-2.5">
               Color Theme
@@ -173,7 +173,7 @@ export const Settings: React.FC = () => {
                 className={`p-3 rounded-xl border text-center transition-colors cursor-pointer ${
                   theme === 'light' 
                     ? 'border-rose-500 bg-rose-500/10 text-rose-500 font-semibold' 
-                    : 'border-neutral-200 dark:border-white/10 text-neutral-400 hover:text-neutral-700 dark:hover:text-white'
+                    : 'border-neutral-200 dark:border-neutral-700 text-neutral-400 hover:text-neutral-700 dark:hover:text-white'
                 }`}
               >
                 <FiSun className="w-5 h-5 mx-auto mb-1 text-rose-500" />
@@ -185,7 +185,7 @@ export const Settings: React.FC = () => {
                 className={`p-3 rounded-xl border text-center transition-colors cursor-pointer ${
                   theme === 'dark' 
                     ? 'border-rose-500 bg-rose-500/10 text-rose-500 font-semibold' 
-                    : 'border-neutral-200 dark:border-white/10 text-neutral-400 hover:text-neutral-700 dark:hover:text-white'
+                    : 'border-neutral-200 dark:border-neutral-700 text-neutral-400 hover:text-neutral-700 dark:hover:text-white'
                 }`}
               >
                 <FiMoon className="w-5 h-5 mx-auto mb-1 text-rose-500" />
@@ -197,7 +197,7 @@ export const Settings: React.FC = () => {
                 className={`p-3 rounded-xl border text-center transition-colors cursor-pointer ${
                   theme === 'system' 
                     ? 'border-rose-500 bg-rose-500/10 text-rose-500 font-semibold' 
-                    : 'border-neutral-200 dark:border-white/10 text-neutral-400 hover:text-neutral-700 dark:hover:text-white'
+                    : 'border-neutral-200 dark:border-neutral-700 text-neutral-400 hover:text-neutral-700 dark:hover:text-white'
                 }`}
               >
                 <FiSliders className="w-5 h-5 mx-auto mb-1 text-rose-500" />
@@ -210,7 +210,7 @@ export const Settings: React.FC = () => {
 
       {/* Tab: Automation & Workers */}
       {activeTab === 'automation' && (
-        <div className="glass-panel p-5 rounded-2xl border border-neutral-200 dark:border-white/10 space-y-4">
+        <div className="glass-panel p-5 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1">
@@ -241,7 +241,7 @@ export const Settings: React.FC = () => {
             </div>
           </div>
 
-          <div className="pt-2 border-t border-neutral-100 dark:border-white/5">
+          <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800">
             <label className="flex items-center gap-2 cursor-pointer text-xs font-medium">
               <input
                 type="checkbox"
@@ -279,7 +279,7 @@ export const Settings: React.FC = () => {
                     <span className="font-semibold text-xs text-neutral-900 dark:text-neutral-100">
                       {p.name}
                     </span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-white/5 text-neutral-500 font-mono">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 font-mono">
                       v{p.version}
                     </span>
                   </div>
@@ -290,7 +290,7 @@ export const Settings: React.FC = () => {
 
                 <button
                   onClick={() => setEditingPrompt(p)}
-                  className="px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 text-xs font-medium cursor-pointer self-start md:self-auto"
+                  className="btn-secondary self-start md:self-auto"
                 >
                   Edit Template
                 </button>
@@ -319,7 +319,7 @@ export const Settings: React.FC = () => {
                   </button>
                   <button
                     onClick={handleSavePrompt}
-                    className="px-4 py-1.5 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
+                    className="btn-primary-red"
                   >
                     Save Changes
                   </button>
@@ -332,7 +332,7 @@ export const Settings: React.FC = () => {
 
       {/* Tab: Backup & Recovery */}
       {activeTab === 'backup' && (
-        <div className="glass-panel p-5 rounded-2xl border border-neutral-200 dark:border-white/10 space-y-4">
+        <div className="glass-panel p-5 space-y-4">
           <div>
             <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
               Database Snapshot & Recovery
@@ -345,14 +345,14 @@ export const Settings: React.FC = () => {
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={handleExportBackup}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
+              className="btn-primary-red"
             >
-              <FiDownloadCloud className="w-4 h-4" />
+              <FiDownloadCloud className="w-3.5 h-3.5" />
               <span>Export Backup (.json)</span>
             </button>
 
-            <label className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 text-xs font-medium cursor-pointer transition-colors">
-              <FiUploadCloud className="w-4 h-4 text-rose-500" />
+            <label className="btn-secondary">
+              <FiUploadCloud className="w-3.5 h-3.5 text-rose-500" />
               <span>Restore Backup</span>
               <input
                 type="file"
@@ -367,7 +367,7 @@ export const Settings: React.FC = () => {
 
       {/* Tab: About */}
       {activeTab === 'about' && (
-        <div className="glass-panel p-5 rounded-2xl border border-neutral-200 dark:border-white/10 space-y-3">
+        <div className="glass-panel p-5 space-y-3">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-rose-600 flex items-center justify-center text-white font-bold text-xs">
               EF

@@ -21,22 +21,22 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   actionIcon: ActionIcon = FiPlus
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-6 text-center rounded-3xl border border-dashed border-neutral-300/70 dark:border-white/10 bg-white/40 dark:bg-white/[0.02]">
-      <div className="p-4 rounded-2xl bg-neutral-200/60 dark:bg-white/5 border border-neutral-300/40 dark:border-white/10 text-neutral-400 dark:text-neutral-500 mb-4 shadow-sm">
-        <Icon className="w-8 h-8" />
+    <div className="flex flex-col items-center justify-center py-16 px-6 text-center rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/30">
+      <div className="p-3.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-400 dark:text-neutral-400 mb-3">
+        <Icon className="w-7 h-7" />
       </div>
-      <h3 className="text-base font-bold text-neutral-800 dark:text-neutral-200 mb-1">
+      <h3 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1">
         {title}
       </h3>
-      <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-sm mb-6 leading-relaxed">
+      <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-sm mb-5 leading-relaxed">
         {description}
       </p>
       {actionLabel && onAction && (
         <button
           onClick={onAction}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl btn-primary-red text-sm font-semibold shadow-lg shadow-rose-900/20 active:scale-95 transition-all"
+          className="btn-primary-red"
         >
-          <ActionIcon className="w-4 h-4" />
+          <ActionIcon className="w-3.5 h-3.5" />
           <span>{actionLabel}</span>
         </button>
       )}

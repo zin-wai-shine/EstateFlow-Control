@@ -36,10 +36,10 @@ export const TopNavbar: React.FC = () => {
             EF
           </div>
           <div className="flex items-center gap-2">
-            <span className="font-bold text-sm tracking-tight text-neutral-900 dark:text-neutral-100">
+            <span className="font-bold text-sm tracking-tight text-neutral-900 dark:text-white">
               Estate<span className="text-rose-600 dark:text-rose-500">Flow</span>
             </span>
-            <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-neutral-200/80 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-neutral-300/40 dark:border-white/10">
+            <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700">
               Control
             </span>
           </div>
@@ -48,10 +48,10 @@ export const TopNavbar: React.FC = () => {
         {/* Live System Indicator */}
         <div 
           onClick={() => setActivePage('health')}
-          className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 hover:border-neutral-300 dark:hover:border-white/20 transition-colors cursor-pointer text-xs"
+          className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors cursor-pointer text-xs"
         >
           <span className={`inline-flex rounded-full h-2 w-2 ${activeJobCount > 0 ? 'bg-blue-500 animate-pulse' : 'bg-emerald-500'}`}></span>
-          <span className="text-neutral-700 dark:text-neutral-300 font-medium">
+          <span className="text-neutral-700 dark:text-neutral-200 font-medium">
             {activeJobCount > 0 ? `${activeJobCount} active jobs` : 'System Idle'}
           </span>
           <span className="text-neutral-300 dark:text-neutral-600">|</span>
@@ -89,38 +89,38 @@ export const TopNavbar: React.FC = () => {
         <button
           onClick={openOnboarding}
           title="First-Run Setup Guide"
-          className="p-1.5 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors"
+          className="p-1.5 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
         >
           <FiHelpCircle className="w-4 h-4" />
         </button>
 
         {/* Theme Toggle */}
-        <div className="flex items-center p-0.5 rounded-lg bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10">
+        <div className="flex items-center p-0.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
           <button
             onClick={() => setTheme('light')}
             title="Light Theme"
-            className={`p-1.5 rounded-md transition-colors ${theme === 'light' ? 'bg-white text-rose-600 shadow-sm' : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-white'}`}
+            className={`p-1.5 rounded-md transition-colors cursor-pointer ${theme === 'light' ? 'bg-white text-rose-600 shadow-sm' : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-white'}`}
           >
             <FiSun className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => setTheme('dark')}
             title="Dark Theme"
-            className={`p-1.5 rounded-md transition-colors ${theme === 'dark' ? 'bg-neutral-800 text-rose-500 shadow-sm' : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-white'}`}
+            className={`p-1.5 rounded-md transition-colors cursor-pointer ${theme === 'dark' ? 'bg-neutral-700 text-rose-400 shadow-sm' : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-white'}`}
           >
             <FiMoon className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => setTheme('system')}
             title="System Theme"
-            className={`p-1.5 rounded-md transition-colors ${theme === 'system' ? 'bg-white dark:bg-neutral-800 text-rose-500 shadow-sm' : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-white'}`}
+            className={`p-1.5 rounded-md transition-colors cursor-pointer ${theme === 'system' ? 'bg-white dark:bg-neutral-700 text-rose-400 shadow-sm' : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-white'}`}
           >
             <FiMonitor className="w-3.5 h-3.5" />
           </button>
         </div>
 
         {/* User / Logout */}
-        <div className="flex items-center gap-2.5 pl-2.5 border-l border-neutral-200 dark:border-white/10">
+        <div className="flex items-center gap-2.5 pl-2.5 border-l border-neutral-200 dark:border-neutral-800">
           <div className="hidden sm:block text-right">
             <div className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
               Admin
@@ -132,7 +132,7 @@ export const TopNavbar: React.FC = () => {
           <button
             onClick={logout}
             title="Sign Out"
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
+            className="p-1.5 rounded-lg text-neutral-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
           >
             <FiLogOut className="w-4 h-4" />
           </button>

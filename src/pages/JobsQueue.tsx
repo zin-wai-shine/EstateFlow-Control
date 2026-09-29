@@ -58,9 +58,9 @@ export const JobsQueue: React.FC = () => {
       </div>
 
       {/* Table of Jobs */}
-      <div className="glass-panel rounded-xl overflow-hidden border border-neutral-200 dark:border-white/10">
+      <div className="glass-panel rounded-xl overflow-hidden">
         <table className="w-full text-left text-xs">
-          <thead className="bg-neutral-100 dark:bg-white/5 border-b border-neutral-200 dark:border-white/10 text-neutral-500 dark:text-neutral-400 font-medium">
+          <thead className="bg-neutral-100 dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-800 text-neutral-500 dark:text-neutral-400 font-medium">
             <tr>
               <th className="py-2.5 px-4">Job & Task</th>
               <th className="py-2.5 px-4">Property</th>
@@ -70,7 +70,7 @@ export const JobsQueue: React.FC = () => {
               <th className="py-2.5 px-4 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-100 dark:divide-white/5">
+          <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
             {filteredJobs.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-neutral-400">
@@ -79,7 +79,7 @@ export const JobsQueue: React.FC = () => {
               </tr>
             ) : (
               filteredJobs.map((job) => (
-                <tr key={job.id} className="hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors">
+                <tr key={job.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-800/40 transition-colors">
                   <td className="py-2.5 px-4">
                     <div className="font-semibold text-neutral-900 dark:text-neutral-100">
                       {job.stageName || job.workflowType}

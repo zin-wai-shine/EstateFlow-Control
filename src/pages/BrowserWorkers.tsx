@@ -1,4 +1,4 @@
-// EstateFlow Control - Browser Workers & Chrome Profiles (Normal Case, Clean)
+// EstateFlow Control - Browser Workers & Chrome Profiles (Clean Dark Mode & Standard Sized Buttons)
 import React, { useState } from 'react';
 import { 
   FiExternalLink, 
@@ -58,7 +58,7 @@ export const BrowserWorkers: React.FC = () => {
 
         <button
           onClick={handleTestConnection}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 text-xs font-medium transition-colors cursor-pointer"
+          className="btn-secondary"
         >
           <FiRefreshCw className="w-3.5 h-3.5 text-rose-500" />
           <span>Test OpenClaw Bridge</span>
@@ -67,7 +67,7 @@ export const BrowserWorkers: React.FC = () => {
 
       {/* Profiles Grid */}
       <div className="space-y-2.5">
-        <h2 className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+        <h2 className="text-xs font-semibold text-neutral-600 dark:text-neutral-400">
           Configured Chrome Profiles ({profiles.length})
         </h2>
 
@@ -79,25 +79,25 @@ export const BrowserWorkers: React.FC = () => {
                   <h3 className="font-semibold text-sm text-neutral-900 dark:text-neutral-100">
                     {prof.friendlyName}
                   </h3>
-                  <div className="text-[11px] text-neutral-400 font-mono mt-0.5">
+                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400 font-mono mt-0.5">
                     Profile dir: {prof.profileDirName}
                   </div>
                 </div>
                 <StatusBadge status={prof.chatGptSessionStatus} size="sm" />
               </div>
 
-              <p className="text-xs text-neutral-400 leading-relaxed">
+              <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
                 {prof.notes}
               </p>
 
-              <div className="flex items-center justify-between text-xs pt-2 border-t border-neutral-100 dark:border-white/5">
-                <span className="text-neutral-500">
-                  Workers: <strong className="text-neutral-300">{prof.assignedWorkerCount} tabs</strong>
+              <div className="flex items-center justify-between text-xs pt-2.5 border-t border-neutral-200 dark:border-neutral-800">
+                <span className="text-neutral-500 dark:text-neutral-400">
+                  Workers: <strong className="text-neutral-700 dark:text-neutral-200">{prof.assignedWorkerCount} tabs</strong>
                 </span>
 
                 <button
                   onClick={() => handleOpenBrowser(prof)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
+                  className="btn-primary-red"
                 >
                   <FiExternalLink className="w-3.5 h-3.5" />
                   <span>Open Native Chrome</span>
@@ -112,7 +112,7 @@ export const BrowserWorkers: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 pt-1">
         {/* Workers List (2 cols) */}
         <div className="lg:col-span-2 space-y-2.5">
-          <h2 className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+          <h2 className="text-xs font-semibold text-neutral-600 dark:text-neutral-400">
             Active Automation Worker Tabs ({workers.length})
           </h2>
 
@@ -123,12 +123,14 @@ export const BrowserWorkers: React.FC = () => {
                 <div
                   key={w.id}
                   onClick={() => setSelectedWorker(w)}
-                  className={`glass-card p-3.5 rounded-xl cursor-pointer transition-colors flex items-center justify-between ${
-                    isSelected ? 'border-rose-500/40 bg-rose-500/[0.03]' : ''
+                  className={`glass-card p-3 rounded-lg cursor-pointer transition-colors flex items-center justify-between ${
+                    isSelected 
+                      ? 'border-rose-500/50 bg-rose-500/5 dark:bg-rose-500/10' 
+                      : ''
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-neutral-100 dark:bg-white/5 text-rose-500">
+                    <div className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-rose-500">
                       <FiCpu className="w-4 h-4" />
                     </div>
                     <div>
@@ -138,7 +140,7 @@ export const BrowserWorkers: React.FC = () => {
                         </span>
                         <StatusBadge status={w.status} size="sm" />
                       </div>
-                      <div className="text-[11px] text-neutral-400 mt-0.5">
+                      <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
                         {w.currentTaskDescription || 'Awaiting job queue'}
                       </div>
                     </div>
@@ -146,10 +148,10 @@ export const BrowserWorkers: React.FC = () => {
 
                   <div className="flex items-center gap-4 text-xs">
                     <div className="text-right hidden sm:block">
-                      <div className="font-medium text-neutral-300">
+                      <div className="font-medium text-neutral-700 dark:text-neutral-300">
                         {w.totalJobsProcessed} jobs
                       </div>
-                      <div className="text-[10px] text-emerald-400">
+                      <div className="text-[10px] text-emerald-500">
                         {w.successRate}% success
                       </div>
                     </div>
@@ -160,7 +162,7 @@ export const BrowserWorkers: React.FC = () => {
                         handleRestartWorker(w);
                       }}
                       title="Reset Worker State"
-                      className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-800 dark:hover:text-white hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
                     >
                       <FiRefreshCw className="w-3.5 h-3.5" />
                     </button>
@@ -173,19 +175,19 @@ export const BrowserWorkers: React.FC = () => {
 
         {/* Live Worker Preview (1 col) */}
         <div className="space-y-2.5">
-          <h2 className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5">
+          <h2 className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 flex items-center gap-1.5">
             <FiEye className="text-rose-500" />
             <span>Worker Telemetry</span>
           </h2>
 
           {selectedWorker ? (
-            <div className="glass-panel p-4 rounded-xl border border-neutral-200 dark:border-white/10 space-y-3.5">
-              <div className="flex items-center justify-between pb-2 border-b border-neutral-100 dark:border-white/5">
+            <div className="glass-panel p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 space-y-3.5">
+              <div className="flex items-center justify-between pb-2 border-b border-neutral-200 dark:border-neutral-800">
                 <div>
                   <h3 className="font-semibold text-xs text-neutral-900 dark:text-neutral-100">
                     {selectedWorker.name}
                   </h3>
-                  <span className="text-[10px] text-neutral-400">
+                  <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
                     {selectedWorker.profileFriendlyName}
                   </span>
                 </div>
@@ -193,39 +195,41 @@ export const BrowserWorkers: React.FC = () => {
               </div>
 
               {/* Snapshot Preview Box */}
-              <div className="h-40 rounded-lg overflow-hidden bg-black/40 border border-neutral-200 dark:border-white/10 relative">
+              <div className="h-40 rounded-lg overflow-hidden bg-neutral-900 border border-neutral-200 dark:border-neutral-800 relative">
                 <img
                   src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80"
                   alt="Worker DOM Preview"
-                  className="w-full h-full object-cover opacity-80"
+                  className="w-full h-full object-cover opacity-85"
                 />
-                <div className="absolute bottom-2 left-2 right-2 p-2 rounded bg-black/75 text-[10px] text-white">
+                <div className="absolute bottom-2 left-2 right-2 p-2 rounded-md bg-neutral-950/85 text-[11px] text-neutral-200">
                   <strong>Action:</strong> {selectedWorker.lastAction || 'Worker initialized'}
                 </div>
               </div>
 
               <div className="text-xs">
-                <span className="text-[10px] text-neutral-400 block">
+                <span className="text-[11px] text-neutral-500 dark:text-neutral-400 block">
                   Next Expected Event
                 </span>
-                <p className="text-neutral-300 font-medium mt-0.5">
+                <p className="text-neutral-700 dark:text-neutral-200 font-medium mt-0.5">
                   {selectedWorker.nextExpectedAction || 'Polling job queue'}
                 </p>
               </div>
 
-              <button
-                onClick={() => {
-                  const prof = profiles.find(p => p.id === selectedWorker.profileId);
-                  if (prof) handleOpenBrowser(prof);
-                }}
-                className="w-full py-2 rounded-lg btn-primary-red text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <FiExternalLink className="w-3.5 h-3.5" />
-                <span>Open Chrome Session</span>
-              </button>
+              <div className="pt-1 flex justify-end">
+                <button
+                  onClick={() => {
+                    const prof = profiles.find(p => p.id === selectedWorker.profileId);
+                    if (prof) handleOpenBrowser(prof);
+                  }}
+                  className="btn-primary-red"
+                >
+                  <FiExternalLink className="w-3.5 h-3.5" />
+                  <span>Open Chrome Session</span>
+                </button>
+              </div>
             </div>
           ) : (
-            <div className="p-6 text-center glass-panel rounded-xl text-xs text-neutral-400">
+            <div className="p-6 text-center glass-panel rounded-xl text-xs text-neutral-500 dark:text-neutral-400">
               Select a worker to inspect telemetry.
             </div>
           )}

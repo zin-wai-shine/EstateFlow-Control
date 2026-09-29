@@ -87,9 +87,9 @@ export const Properties: React.FC = () => {
 
         <button
           onClick={openCreateProperty}
-          className="flex items-center gap-2 px-3.5 py-2 rounded-lg btn-primary-red text-xs font-semibold shrink-0 self-start sm:self-auto cursor-pointer"
+          className="btn-primary-red shrink-0 self-start sm:self-auto"
         >
-          <FiPlus className="w-4 h-4" />
+          <FiPlus className="w-3.5 h-3.5" />
           <span>New Property</span>
         </button>
       </div>
@@ -98,7 +98,7 @@ export const Properties: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-3 p-2.5 rounded-xl glass-panel text-xs">
         <div className="flex flex-wrap items-center gap-2">
           {/* Status Select */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10">
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
             <FiFilter className="text-neutral-400 w-3.5 h-3.5" />
             <select
               value={selectedStatus}
@@ -115,7 +115,7 @@ export const Properties: React.FC = () => {
           </div>
 
           {/* Type Select */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10">
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
             <select
               value={selectedListingType}
               onChange={(e) => setSelectedListingType(e.target.value)}
@@ -129,7 +129,7 @@ export const Properties: React.FC = () => {
           </div>
 
           {/* Sort */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10">
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
             <span className="text-neutral-400">Sort:</span>
             <select
               value={sortBy}
@@ -145,18 +145,18 @@ export const Properties: React.FC = () => {
         </div>
 
         {/* View Toggle */}
-        <div className="flex items-center p-0.5 rounded-lg bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10">
+        <div className="flex items-center p-0.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
           <button
             onClick={() => setViewMode('grid')}
             title="Grid View"
-            className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white dark:bg-neutral-800 text-rose-500 shadow-sm' : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-white'}`}
+            className={`p-1.5 rounded-md transition-colors cursor-pointer ${viewMode === 'grid' ? 'bg-white dark:bg-neutral-700 text-rose-500 shadow-sm' : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-white'}`}
           >
             <FiGrid className="w-4 h-4" />
           </button>
           <button
             onClick={() => setViewMode('table')}
             title="Table View"
-            className={`p-1.5 rounded-md transition-colors ${viewMode === 'table' ? 'bg-white dark:bg-neutral-800 text-rose-500 shadow-sm' : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-white'}`}
+            className={`p-1.5 rounded-md transition-colors cursor-pointer ${viewMode === 'table' ? 'bg-white dark:bg-neutral-700 text-rose-500 shadow-sm' : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-white'}`}
           >
             <FiList className="w-4 h-4" />
           </button>
@@ -244,7 +244,7 @@ export const Properties: React.FC = () => {
                 </div>
 
                 {/* Footer Controls */}
-                <div className="px-4 py-2.5 border-t border-neutral-100 dark:border-white/5 flex items-center justify-between text-xs">
+                <div className="px-4 py-2.5 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between text-xs">
                   <span className="text-neutral-400 text-[11px] truncate max-w-[160px]">
                     {prop.nearestTransit || 'Transit nearby'}
                   </span>
@@ -252,7 +252,7 @@ export const Properties: React.FC = () => {
                     <button
                       onClick={(e) => handleDelete(prop.id, prop.projectName, e)}
                       title="Delete Property"
-                      className="p-1 rounded text-neutral-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
+                      className="p-1 rounded text-neutral-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
                     >
                       <FiTrash2 className="w-3.5 h-3.5" />
                     </button>
@@ -268,9 +268,9 @@ export const Properties: React.FC = () => {
         </div>
       ) : (
         /* Table View */
-        <div className="glass-panel rounded-xl overflow-hidden border border-neutral-200 dark:border-white/10">
+        <div className="glass-panel rounded-xl overflow-hidden">
           <table className="w-full text-left text-xs">
-            <thead className="bg-neutral-100 dark:bg-white/5 border-b border-neutral-200 dark:border-white/10 text-neutral-500 dark:text-neutral-400 font-medium">
+            <thead className="bg-neutral-100 dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-800 text-neutral-500 dark:text-neutral-400 font-medium">
               <tr>
                 <th className="py-2.5 px-4">Property</th>
                 <th className="py-2.5 px-4">Status</th>
@@ -280,7 +280,7 @@ export const Properties: React.FC = () => {
                 <th className="py-2.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100 dark:divide-white/5">
+            <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
               {filteredProperties.map((prop) => {
                 const propImages = allImages.filter(i => i.propertyId === prop.id);
                 const primaryImg = propImages.find(i => i.isFavorite) || propImages[0];
@@ -290,11 +290,11 @@ export const Properties: React.FC = () => {
                   <tr
                     key={prop.id}
                     onClick={() => openPropertyDetail(prop.id)}
-                    className="hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                    className="hover:bg-neutral-50 dark:hover:bg-neutral-800/40 transition-colors cursor-pointer"
                   >
                     <td className="py-2.5 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg overflow-hidden bg-neutral-800 shrink-0 border border-neutral-200 dark:border-white/10">
+                        <div className="w-9 h-9 rounded-lg overflow-hidden bg-neutral-800 shrink-0 border border-neutral-200 dark:border-neutral-800">
                           {primaryImg?.previewUrl ? (
                             <img src={primaryImg.previewUrl} alt="" className="w-full h-full object-cover" />
                           ) : (

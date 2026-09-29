@@ -74,8 +74,8 @@ export const AutomationCenter: React.FC = () => {
       </div>
 
       {/* Main Runner Configurator */}
-      <div className="glass-panel p-5 rounded-2xl border border-neutral-200 dark:border-white/10 space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-neutral-100 dark:border-white/5">
+      <div className="glass-panel p-5 space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-neutral-200 dark:border-neutral-800">
           <div>
             <h2 className="text-xs font-semibold text-neutral-900 dark:text-neutral-100 flex items-center gap-1.5">
               <FiZap className="text-rose-500" />
@@ -88,7 +88,7 @@ export const AutomationCenter: React.FC = () => {
 
           <button
             onClick={handleStartWorkflow}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
+            className="btn-primary-red"
           >
             <FiPlay className="w-3.5 h-3.5 fill-white" />
             <span>Launch Pipeline</span>

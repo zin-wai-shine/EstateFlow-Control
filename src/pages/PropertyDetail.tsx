@@ -117,11 +117,11 @@ export const PropertyDetail: React.FC = () => {
   return (
     <div className="space-y-5">
       {/* Top Breadcrumb & Action Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl glass-panel border border-neutral-200 dark:border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl glass-panel">
         <div className="flex items-center gap-3.5">
           <button
             onClick={() => setActivePage('properties')}
-            className="p-2 rounded-lg bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 transition-colors text-neutral-600 dark:text-neutral-300 cursor-pointer"
+            className="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors text-neutral-600 dark:text-neutral-300 cursor-pointer"
             title="Back to Listings"
           >
             <FiArrowLeft className="w-4 h-4" />
@@ -143,7 +143,7 @@ export const PropertyDetail: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={handleRunCompleteWorkflow}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
+            className="btn-primary-red"
           >
             <FiPlay className="w-3.5 h-3.5 fill-white" />
             <span>Start Complete Workflow</span>
@@ -152,7 +152,7 @@ export const PropertyDetail: React.FC = () => {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex items-center gap-1.5 border-b border-neutral-200 dark:border-white/10 pb-2 overflow-x-auto text-xs font-medium">
+      <div className="flex items-center gap-1.5 border-b border-neutral-200 dark:border-neutral-800 pb-2 overflow-x-auto text-xs font-medium">
         {[
           { id: 'images', label: `Images (${images.length})`, icon: FiImage },
           { id: 'overview', label: 'Overview Specs', icon: FiFileText },
@@ -171,7 +171,7 @@ export const PropertyDetail: React.FC = () => {
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
                 isActive
                   ? 'bg-rose-500/10 text-rose-500 dark:text-rose-400 font-semibold border border-rose-500/20'
-                  : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/5'
+                  : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -185,7 +185,7 @@ export const PropertyDetail: React.FC = () => {
       {activeTab === 'images' && (
         <div className="space-y-5">
           {/* Drag & Drop Upload Zone */}
-          <div className="p-6 rounded-2xl border border-dashed border-neutral-300 dark:border-white/15 bg-neutral-50/50 dark:bg-white/[0.02] hover:bg-neutral-100/50 dark:hover:bg-white/[0.04] transition-colors flex flex-col items-center justify-center text-center relative cursor-pointer">
+          <div className="p-6 rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-900/50 hover:bg-neutral-100/50 dark:hover:bg-neutral-800/50 transition-colors flex flex-col items-center justify-center text-center relative cursor-pointer">
             <input
               type="file"
               multiple
@@ -193,7 +193,7 @@ export const PropertyDetail: React.FC = () => {
               onChange={handleFileUpload}
               className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
             />
-            <div className="p-2.5 rounded-xl bg-neutral-200/60 dark:bg-white/5 text-neutral-500 dark:text-neutral-400 mb-2">
+            <div className="p-2.5 rounded-xl bg-neutral-200/60 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 mb-2">
               <FiUploadCloud className="w-6 h-6" />
             </div>
             <h3 className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
@@ -280,7 +280,7 @@ export const PropertyDetail: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="px-3 py-2 border-t border-neutral-100 dark:border-white/5 flex items-center justify-between text-[11px]">
+                <div className="px-3 py-2 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between text-[11px]">
                   <label 
                     className="flex items-center gap-1.5 text-neutral-400 hover:text-neutral-200 cursor-pointer"
                   >
@@ -313,7 +313,7 @@ export const PropertyDetail: React.FC = () => {
               {property.description}
             </p>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-neutral-100 dark:border-white/5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-neutral-200 dark:border-neutral-800">
               <div>
                 <span className="text-[11px] text-neutral-400 block">Layout</span>
                 <span className="text-xs font-medium text-neutral-900 dark:text-neutral-100">
@@ -340,11 +340,11 @@ export const PropertyDetail: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-3 border-t border-neutral-100 dark:border-white/5">
+            <div className="pt-3 border-t border-neutral-200 dark:border-neutral-800">
               <span className="text-[11px] text-neutral-400 block mb-1.5">Equipment & Appliances</span>
               <div className="flex flex-wrap gap-1.5">
                 {property.equipment.map((eq, i) => (
-                  <span key={i} className="text-xs px-2 py-0.5 rounded bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 text-neutral-700 dark:text-neutral-300">
+                  <span key={i} className="text-xs px-2 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300">
                     {eq}
                   </span>
                 ))}
@@ -356,7 +356,7 @@ export const PropertyDetail: React.FC = () => {
             <h3 className="text-xs font-semibold text-neutral-900 dark:text-neutral-100">
               Financial Terms
             </h3>
-            <div className="p-3.5 rounded-xl bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 text-rose-500">
+            <div className="p-3.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-rose-500">
               <span className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400 block">Monthly Rental</span>
               <span className="text-xl font-bold">
                 ฿{property.rentalPrice?.toLocaleString() || 'Inquire'}/mo
@@ -364,19 +364,19 @@ export const PropertyDetail: React.FC = () => {
             </div>
 
             <div className="space-y-1.5 text-xs">
-              <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-white/5">
+              <div className="flex justify-between py-1 border-b border-neutral-200 dark:border-neutral-800">
                 <span className="text-neutral-400">Security Deposit</span>
                 <span className="font-medium text-neutral-200">{property.depositMonths} Months</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-white/5">
+              <div className="flex justify-between py-1 border-b border-neutral-200 dark:border-neutral-800">
                 <span className="text-neutral-400">Advance Rent</span>
                 <span className="font-medium text-neutral-200">{property.advancePaymentMonths} Month</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-white/5">
+              <div className="flex justify-between py-1 border-b border-neutral-200 dark:border-neutral-800">
                 <span className="text-neutral-400">Contract Length</span>
                 <span className="font-medium text-neutral-200">{property.contractDurationMonths} Months</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-white/5">
+              <div className="flex justify-between py-1 border-b border-neutral-200 dark:border-neutral-800">
                 <span className="text-neutral-400">Pets</span>
                 <span className={`font-medium ${property.petsAllowed ? 'text-emerald-400' : 'text-neutral-400'}`}>
                   {property.petsAllowed ? 'Allowed' : 'Not Allowed'}
@@ -390,7 +390,7 @@ export const PropertyDetail: React.FC = () => {
       {/* Tab: Automation Pipeline */}
       {activeTab === 'automation' && (
         <div className="space-y-4">
-          <div className="glass-panel p-4 rounded-xl border border-neutral-200 dark:border-white/10 flex items-center justify-between">
+          <div className="glass-panel p-4 flex items-center justify-between">
             <div>
               <h3 className="text-xs font-semibold text-neutral-900 dark:text-neutral-100">
                 Live Automation Tasks for {property.projectName}
@@ -401,7 +401,7 @@ export const PropertyDetail: React.FC = () => {
             </div>
             <button
               onClick={handleRunCompleteWorkflow}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
+              className="btn-primary-red"
             >
               <FiPlay className="w-3 h-3" />
               <span>Rerun Full Pipeline</span>
@@ -448,7 +448,7 @@ export const PropertyDetail: React.FC = () => {
                 <h4 className="text-xs font-medium text-neutral-400">
                   Facebook Post Copy
                 </h4>
-                <div className="p-3 rounded-lg bg-neutral-100 dark:bg-black/30 text-xs font-mono whitespace-pre-wrap leading-relaxed">
+                <div className="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-900 text-xs font-mono whitespace-pre-wrap leading-relaxed">
                   {content.facebookPost}
                 </div>
               </div>
@@ -456,7 +456,7 @@ export const PropertyDetail: React.FC = () => {
                 <h4 className="text-xs font-medium text-neutral-400">
                   Facebook Marketplace Listing
                 </h4>
-                <div className="p-3 rounded-lg bg-neutral-100 dark:bg-black/30 text-xs font-mono whitespace-pre-wrap leading-relaxed">
+                <div className="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-900 text-xs font-mono whitespace-pre-wrap leading-relaxed">
                   <strong className="text-rose-500 block mb-1">{content.marketplaceTitle}</strong>
                   {content.marketplaceDescription}
                 </div>
@@ -470,7 +470,7 @@ export const PropertyDetail: React.FC = () => {
                   automationEngine.queueContentGeneration(property);
                   addNotification('info', 'Generation Started', 'Synthesizing marketing copy...');
                 }}
-                className="px-3.5 py-1.5 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
+                className="btn-primary-red"
               >
                 Synthesize Content Now
               </button>
@@ -482,7 +482,7 @@ export const PropertyDetail: React.FC = () => {
       {/* Tab: Local Files Representation */}
       {activeTab === 'files' && (
         <div className="glass-panel p-5 rounded-2xl space-y-3">
-          <div className="pb-2 border-b border-neutral-100 dark:border-white/5">
+          <div className="pb-2 border-b border-neutral-200 dark:border-neutral-800">
             <h3 className="text-xs font-semibold text-neutral-900 dark:text-neutral-100">
               Storage: ~/Documents/EstateFlow Control/{property.projectName}
             </h3>
@@ -490,7 +490,7 @@ export const PropertyDetail: React.FC = () => {
 
           <div className="space-y-1.5 text-xs font-mono">
             {['Original', 'Enhanced', 'Hero', 'Content', 'Exports', 'Logs'].map((folder) => (
-              <div key={folder} className="p-2.5 rounded-lg bg-neutral-100 dark:bg-white/5 flex items-center justify-between">
+              <div key={folder} className="p-2.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-neutral-800 dark:text-neutral-200">
                   <FiFolder className="text-rose-500 w-3.5 h-3.5" />
                   <span>/{folder}</span>

@@ -69,7 +69,7 @@ export const Publishing: React.FC = () => {
       </div>
 
       {/* Quick Add Channel Section */}
-      <div className="glass-panel p-4 rounded-xl border border-neutral-200 dark:border-white/10 flex flex-wrap items-center justify-between gap-3">
+      <div className="glass-panel p-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
             Target Property:
@@ -88,21 +88,21 @@ export const Publishing: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleQueueChannel('facebook_marketplace')}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 text-xs font-medium transition-colors cursor-pointer"
+            className="btn-secondary"
           >
             <FiPlus className="w-3.5 h-3.5 text-rose-500" />
             <span>Facebook Marketplace</span>
           </button>
           <button
             onClick={() => handleQueueChannel('facebook_page')}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 text-xs font-medium transition-colors cursor-pointer"
+            className="btn-secondary"
           >
             <FiPlus className="w-3.5 h-3.5 text-rose-500" />
             <span>Facebook Page</span>
           </button>
           <button
             onClick={() => handleQueueChannel('tiktok')}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 text-xs font-medium transition-colors cursor-pointer"
+            className="btn-secondary"
           >
             <FiPlus className="w-3.5 h-3.5 text-rose-500" />
             <span>TikTok</span>
@@ -174,7 +174,7 @@ export const Publishing: React.FC = () => {
                     {record.status === 'pending_approval' && !record.isApproved && (
                       <button
                         onClick={() => handleApprove(record)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition-colors cursor-pointer"
+                        className="btn-sm bg-emerald-600 hover:bg-emerald-500 text-white font-medium inline-flex items-center gap-1.5 cursor-pointer rounded-lg"
                       >
                         <FiCheck className="w-3.5 h-3.5" />
                         <span>Approve</span>
@@ -184,7 +184,7 @@ export const Publishing: React.FC = () => {
                     {(record.status === 'ready' || record.isApproved) && record.status !== 'published' && (
                       <button
                         onClick={() => handlePublish(record)}
-                        className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
+                        className="btn-primary-red"
                       >
                         <FiSend className="w-3.5 h-3.5" />
                         <span>Publish</span>

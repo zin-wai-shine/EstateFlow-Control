@@ -53,7 +53,7 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="space-y-5">
       {/* Top Banner: Direct One-Click Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl glass-panel border border-neutral-200 dark:border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl glass-panel">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="w-2 h-2 rounded-full bg-rose-500" />
@@ -69,15 +69,15 @@ export const Dashboard: React.FC = () => {
         <div className="flex items-center gap-2.5">
           <button
             onClick={openCreateProperty}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
+            className="btn-primary-red"
           >
-            <FiPlus className="w-4 h-4" />
+            <FiPlus className="w-3.5 h-3.5" />
             <span>New Property</span>
           </button>
 
           <button
             onClick={() => setActivePage('automation')}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-white/10 text-xs font-medium transition-colors cursor-pointer"
+            className="btn-secondary"
           >
             <FiPlay className="w-3.5 h-3.5 text-rose-500" />
             <span>Start Workflow</span>
@@ -222,7 +222,7 @@ export const Dashboard: React.FC = () => {
                 >
                   <div className="flex items-center gap-3.5">
                     {/* Thumbnail */}
-                    <div className="w-14 h-14 rounded-lg overflow-hidden bg-neutral-800 shrink-0 border border-neutral-200 dark:border-white/10 relative">
+                    <div className="w-14 h-14 rounded-lg overflow-hidden bg-neutral-800 shrink-0 border border-neutral-200 dark:border-neutral-800 relative">
                       {primaryImg?.previewUrl ? (
                         <img
                           src={primaryImg.previewUrl}
@@ -264,7 +264,7 @@ export const Dashboard: React.FC = () => {
                   </div>
 
                   {/* Right Status */}
-                  <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 pt-2 sm:pt-0 border-neutral-100 dark:border-white/5">
+                  <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 pt-2 sm:pt-0 border-neutral-200 dark:border-neutral-800">
                     <span className="text-xs font-medium text-emerald-500">
                       {completedCount}/{propImages.length} Enhanced
                     </span>
@@ -281,7 +281,7 @@ export const Dashboard: React.FC = () => {
         {/* Right Column (1 col): Recent Activity & System Health */}
         <div className="space-y-4">
           {/* System Health Summary */}
-          <div className="glass-panel p-4 rounded-xl border border-neutral-200 dark:border-white/10">
+          <div className="glass-panel p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-xs font-semibold text-neutral-900 dark:text-neutral-100 flex items-center gap-1.5">
                 <FiShield className="text-rose-500" />
@@ -296,21 +296,21 @@ export const Dashboard: React.FC = () => {
             </div>
 
             <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between py-1 border-b border-neutral-100 dark:border-white/5">
+              <div className="flex items-center justify-between py-1 border-b border-neutral-200 dark:border-neutral-800">
                 <span className="text-neutral-500 dark:text-neutral-400">Desktop Shell</span>
                 <span className="font-medium text-emerald-500 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   macOS Native
                 </span>
               </div>
-              <div className="flex items-center justify-between py-1 border-b border-neutral-100 dark:border-white/5">
+              <div className="flex items-center justify-between py-1 border-b border-neutral-200 dark:border-neutral-800">
                 <span className="text-neutral-500 dark:text-neutral-400">SQLite Database</span>
                 <span className="font-medium text-emerald-500 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   Active
                 </span>
               </div>
-              <div className="flex items-center justify-between py-1 border-b border-neutral-100 dark:border-white/5">
+              <div className="flex items-center justify-between py-1 border-b border-neutral-200 dark:border-neutral-800">
                 <span className="text-neutral-500 dark:text-neutral-400">Docker Services</span>
                 <span className="font-medium text-emerald-500 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
@@ -328,7 +328,7 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {/* Activity Stream */}
-          <div className="glass-panel p-4 rounded-xl border border-neutral-200 dark:border-white/10">
+          <div className="glass-panel p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-xs font-semibold text-neutral-900 dark:text-neutral-100 flex items-center gap-1.5">
                 <FiActivity className="text-rose-500" />

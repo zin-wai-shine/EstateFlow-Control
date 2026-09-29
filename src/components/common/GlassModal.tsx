@@ -57,10 +57,10 @@ export const GlassModal: React.FC<GlassModalProps> = ({
       <div 
         role="dialog"
         aria-modal="true"
-        className={`relative z-10 w-full ${maxWidthClass} max-h-[90vh] flex flex-col rounded-3xl glass-panel border border-white/20 dark:border-white/10 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200`}
+        className={`relative z-10 w-full ${maxWidthClass} max-h-[90vh] flex flex-col rounded-2xl glass-panel shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-neutral-200/50 dark:border-white/10 shrink-0">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-neutral-200 dark:border-neutral-800 shrink-0">
           <div>
             <h3 className="text-lg font-bold tracking-tight text-neutral-900 dark:text-white">
               {title}
@@ -74,7 +74,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
           <button
             onClick={onClose}
             aria-label="Close modal"
-            className="p-2 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-white hover:bg-neutral-200/50 dark:hover:bg-white/10 transition-colors"
+            className="p-2 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
           >
             <FiX className="w-5 h-5" />
           </button>

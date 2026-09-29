@@ -42,7 +42,7 @@ export const OnboardingModal: React.FC = () => {
     >
       <div className="space-y-5">
         {/* Progress Bar */}
-        <div className="w-full h-1.5 rounded-full bg-neutral-200 dark:bg-white/10 overflow-hidden">
+        <div className="w-full h-1.5 rounded-full bg-neutral-200 dark:bg-neutral-800 overflow-hidden">
           <div 
             className="h-full bg-rose-600 transition-all duration-300"
             style={{ width: `${(currentStep / totalSteps) * 100}%` }}
@@ -123,7 +123,7 @@ export const OnboardingModal: React.FC = () => {
             <p className="text-xs text-neutral-400">
               Initial profile "Profile A - Primary Enhancement" configured. You can sign into ChatGPT once; sessions are saved securely within Chrome.
             </p>
-            <div className="p-2.5 rounded-lg bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 text-xs font-mono">
+            <div className="p-2.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-xs font-mono">
               Profile_EstateFlow_A
             </div>
           </div>
@@ -143,18 +143,18 @@ export const OnboardingModal: React.FC = () => {
         )}
 
         {/* Navigation Buttons */}
-        <div className="flex items-center justify-between pt-3 border-t border-neutral-200 dark:border-white/10 text-xs">
+        <div className="flex items-center justify-between pt-3 border-t border-neutral-200 dark:border-neutral-800 text-xs">
           <button
             onClick={handleBack}
             disabled={currentStep === 1}
-            className="px-3.5 py-1.5 rounded-lg text-neutral-400 hover:text-white disabled:opacity-30 cursor-pointer"
+            className="btn-secondary disabled:opacity-30"
           >
             Back
           </button>
 
           <button
             onClick={handleNext}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg btn-primary-red font-medium cursor-pointer"
+            className="btn-primary-red"
           >
             <span>{currentStep === totalSteps ? 'Get Started' : 'Continue'}</span>
             <FiArrowRight className="w-3.5 h-3.5" />

@@ -105,7 +105,7 @@ export const ContentStudio: React.FC = () => {
 
           <button
             onClick={handleRegenerate}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 text-xs font-medium transition-colors cursor-pointer"
+            className="btn-secondary"
           >
             <FiRefreshCw className="w-3.5 h-3.5 text-rose-500" />
             <span>Regenerate Copy</span>
@@ -113,7 +113,7 @@ export const ContentStudio: React.FC = () => {
 
           <button
             onClick={handleSave}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
+            className="btn-primary-red"
           >
             <FiSave className="w-3.5 h-3.5" />
             <span>Save Edits</span>
@@ -124,7 +124,7 @@ export const ContentStudio: React.FC = () => {
       {content ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {/* Facebook Post Copy */}
-          <div className="glass-panel p-4 rounded-2xl border border-neutral-200 dark:border-white/10 space-y-3">
+          <div className="glass-panel p-4 space-y-3">
             <div className="flex items-center justify-between">
               <h2 className="text-xs font-semibold text-neutral-900 dark:text-neutral-100 flex items-center gap-1.5">
                 <FiFileText className="text-rose-500" />
@@ -147,7 +147,7 @@ export const ContentStudio: React.FC = () => {
           </div>
 
           {/* Facebook Marketplace Listing */}
-          <div className="glass-panel p-4 rounded-2xl border border-neutral-200 dark:border-white/10 space-y-3">
+          <div className="glass-panel p-4 space-y-3">
             <div className="flex items-center justify-between">
               <h2 className="text-xs font-semibold text-neutral-900 dark:text-neutral-100 flex items-center gap-1.5">
                 <FiShare2 className="text-rose-500" />
@@ -187,7 +187,7 @@ export const ContentStudio: React.FC = () => {
             </div>
 
             {/* TikTok Caption */}
-            <div className="pt-2 border-t border-neutral-100 dark:border-white/5">
+            <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800">
               <div className="flex items-center justify-between mb-1">
                 <label className="text-[11px] font-medium text-neutral-400">
                   TikTok Tour Caption & Tags
