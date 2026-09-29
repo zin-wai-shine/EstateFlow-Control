@@ -13,7 +13,7 @@ import {
   SystemHealthStatus,
   Process,
   ProcessRun,
-  PropertyLink
+  PropertyLinkGroup
 } from '../types';
 import { db, INITIAL_USER } from '../services/storage';
 import { automationEngine } from '../services/automationEngine';
@@ -68,8 +68,8 @@ interface AppContextType {
   refreshProcesses: () => void;
   processRuns: ProcessRun[];
   refreshProcessRuns: () => void;
-  propertyLinks: PropertyLink[];
-  refreshPropertyLinks: () => void;
+  propertyLinkGroups: PropertyLinkGroup[];
+  refreshPropertyLinkGroups: () => void;
   settings: AppSettings;
   updateSettings: (newSettings: AppSettings) => void;
   health: SystemHealthStatus | null;
@@ -123,7 +123,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [jobs, setJobs] = useState<AutomationJob[]>([]);
   const [processes, setProcesses] = useState<Process[]>([]);
   const [processRuns, setProcessRuns] = useState<ProcessRun[]>([]);
-  const [propertyLinks, setPropertyLinks] = useState<PropertyLink[]>([]);
+  const [propertyLinkGroups, setPropertyLinkGroups] = useState<PropertyLinkGroup[]>([]);
   const [selectedProcessId, setSelectedProcessId] = useState<string | null>(null);
   const [activeProcessRunId, setActiveProcessRunId] = useState<string | null>(null);
   const [settings, setSettings] = useState<AppSettings>(db.getSettings());
@@ -188,8 +188,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setProcessRuns([...db.getProcessRuns()]);
   }, []);
 
-  const refreshPropertyLinks = useCallback(() => {
-    setPropertyLinks([...db.getPropertyLinks()]);
+  const refreshPropertyLinkGroups = useCallback(() => {
+    setPropertyLinkGroups([...db.getPropertyLinkGroups()]);
   }, []);
 
   const refreshHealth = useCallback(async () => {
@@ -218,7 +218,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     refreshJobs();
     refreshProcesses();
     refreshProcessRuns();
-    refreshPropertyLinks();
+    refreshPropertyLinkGroups();
     refreshHealth();
 
     // Subscribe to automation events
@@ -248,7 +248,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       unsubWorker();
       unsubRun();
     };
-  }, [refreshProperties, refreshWorkers, refreshProfiles, refreshJobs, refreshProcesses, refreshProcessRuns, refreshPropertyLinks, refreshHealth]);
+  }, [refreshProperties, refreshWorkers, refreshProfiles, refreshJobs, refreshProcesses, refreshProcessRuns, refreshPropertyLinkGroups, refreshHealth]);
 
   const login = async (email: string, pass: string): Promise<boolean> => {
     // In desktop local mode, accept configured local login
@@ -332,8 +332,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         refreshProcesses,
         processRuns,
         refreshProcessRuns,
-        propertyLinks,
-        refreshPropertyLinks,
+        propertyLinkGroups,
+        refreshPropertyLinkGroups,
         activeProcessRunId,
         openProcessRun,
         closeProcessRun,

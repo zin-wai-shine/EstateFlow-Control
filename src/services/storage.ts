@@ -15,7 +15,7 @@ import {
   Process,
   ProcessStep,
   ProcessRun,
-  PropertyLink
+  PropertyLinkGroup
 } from '../types';
 
 const DB_KEY_PREFIX = 'estateflow_db_';
@@ -542,27 +542,29 @@ export const DEFAULT_PROCESS_RUNS: ProcessRun[] = [
   }
 ];
 
-export const DEFAULT_PROPERTY_LINKS: PropertyLink[] = [
+export const DEFAULT_PROPERTY_LINK_GROUPS: PropertyLinkGroup[] = [
   {
-    id: 'link-1',
-    sourceType: 'owner',
-    url: 'https://www.facebook.com/marketplace/item/1089283749281729',
+    id: 'GROUP-001',
+    groupNumber: 1,
+    links: [
+      'https://www.facebook.com/marketplace/item/1089283749281729',
+      'https://www.facebook.com/groups/bangkokcondos/posts/882736192837192',
+      'https://line.me/ti/g2/condo-direct-owner-asoke-sukhumvit',
+      'https://facebook.com/groups/bangkokrentals/permalink/99182374'
+    ],
     createdAt: new Date(Date.now() - 3600000 * 24 * 2).toISOString(),
     updatedAt: new Date(Date.now() - 3600000 * 24 * 2).toISOString(),
   },
   {
-    id: 'link-2',
-    sourceType: 'agent',
-    url: 'https://www.facebook.com/groups/bangkokcondos/posts/882736192837192',
-    createdAt: new Date(Date.now() - 3600000 * 18).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 18).toISOString(),
-  },
-  {
-    id: 'link-3',
-    sourceType: 'owner',
-    url: 'https://line.me/ti/g2/condo-direct-owner-asoke-sukhumvit',
-    createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 4).toISOString(),
+    id: 'GROUP-002',
+    groupNumber: 2,
+    links: [
+      'https://www.facebook.com/marketplace/item/92837461928374',
+      'https://example.com/property/sukhumvit-luxury-penthouse',
+      'https://line.me/ti/g2/bangkok-prime-properties-deals'
+    ],
+    createdAt: new Date(Date.now() - 3600000 * 14).toISOString(),
+    updatedAt: new Date(Date.now() - 3600000 * 14).toISOString(),
   }
 ];
 
@@ -764,8 +766,20 @@ class LocalDatabase {
       this.setItem('process_runs', DEFAULT_PROCESS_RUNS);
     }
 
-    if (!this.getItem<PropertyLink[] | null>('property_links', null)) {
-      this.setItem('property_links', DEFAULT_PROPERTY_LINKS);
+    if (!this.getItem<PropertyLinkGroup[] | null>('property_link_groups', null)) {
+      const oldLinks = this.getItem<any[]>('property_links', []);
+      if (oldLinks && oldLinks.length > 0) {
+        const migrated: PropertyLinkGroup[] = oldLinks.map((item, idx) => ({
+          id: `GROUP-${String(idx + 1).padStart(3, '0')}`,
+          groupNumber: idx + 1,
+          links: [item.url || item.link].filter(Boolean),
+          createdAt: item.createdAt || new Date().toISOString(),
+          updatedAt: item.updatedAt || new Date().toISOString()
+        }));
+        this.setItem('property_link_groups', migrated);
+      } else {
+        this.setItem('property_link_groups', DEFAULT_PROPERTY_LINK_GROUPS);
+      }
     }
 
     if (!this.getItem<Property[] | null>('properties', null)) {
@@ -1180,32 +1194,41 @@ class LocalDatabase {
     this.setItem('process_runs', list);
   }
 
-  // --- PROPERTY LINKS ---
-  public getPropertyLinks(): PropertyLink[] {
-    return this.getItem<PropertyLink[]>('property_links', DEFAULT_PROPERTY_LINKS);
+  // --- PROPERTY LINK GROUPS ---
+  public getPropertyLinkGroups(): PropertyLinkGroup[] {
+    const list = this.getItem<PropertyLinkGroup[] | null>('property_link_groups', null);
+    if (list !== null) return list;
+    return DEFAULT_PROPERTY_LINK_GROUPS;
   }
 
-  public getPropertyLink(id: string): PropertyLink | undefined {
-    return this.getItem<PropertyLink[]>('property_links', DEFAULT_PROPERTY_LINKS).find(l => l.id === id);
+  public getPropertyLinkGroup(id: string): PropertyLinkGroup | undefined {
+    return this.getPropertyLinkGroups().find(g => g.id === id);
   }
 
-  public savePropertyLink(link: PropertyLink): PropertyLink {
-    const list = this.getItem<PropertyLink[]>('property_links', DEFAULT_PROPERTY_LINKS);
-    const index = list.findIndex(l => l.id === link.id);
+  public savePropertyLinkGroup(group: PropertyLinkGroup): PropertyLinkGroup {
+    const list = [...this.getPropertyLinkGroups()];
+    const index = list.findIndex(g => g.id === group.id);
     if (index >= 0) {
-      list[index] = { ...link, updatedAt: new Date().toISOString() };
+      list[index] = { ...group, updatedAt: new Date().toISOString() };
     } else {
-      list.unshift(link);
+      const nextNum = list.reduce((max, g) => Math.max(max, g.groupNumber || 0), 0) + 1;
+      const newGroup: PropertyLinkGroup = {
+        ...group,
+        groupNumber: group.groupNumber || nextNum,
+        createdAt: group.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      list.unshift(newGroup);
     }
-    this.setItem('property_links', list);
-    return link;
+    this.setItem('property_link_groups', list);
+    return group;
   }
 
-  public deletePropertyLink(id: string): boolean {
-    const list = this.getItem<PropertyLink[]>('property_links', DEFAULT_PROPERTY_LINKS);
-    const filtered = list.filter(l => l.id !== id);
+  public deletePropertyLinkGroup(id: string): boolean {
+    const list = this.getPropertyLinkGroups();
+    const filtered = list.filter(g => g.id !== id);
     if (filtered.length !== list.length) {
-      this.setItem('property_links', filtered);
+      this.setItem('property_link_groups', filtered);
       return true;
     }
     return false;
@@ -1223,7 +1246,7 @@ class LocalDatabase {
       jobs: this.getJobs(),
       processes: this.getProcesses(true),
       process_runs: this.getProcessRuns(),
-      property_links: this.getPropertyLinks(),
+      property_link_groups: this.getPropertyLinkGroups(),
       prompts: this.getPrompts(),
       contents: this.getItem<GeneratedContent[]>('contents', []),
       publishing_records: this.getPublishingRecords(),
@@ -1241,7 +1264,7 @@ class LocalDatabase {
       if (data.workers) this.setItem('workers', data.workers);
       if (data.processes) this.setItem('processes', data.processes);
       if (data.process_runs) this.setItem('process_runs', data.process_runs);
-      if (data.property_links) this.setItem('property_links', data.property_links);
+      if (data.property_link_groups) this.setItem('property_link_groups', data.property_link_groups);
       if (data.prompts) this.setItem('prompts', data.prompts);
       if (data.contents) this.setItem('contents', data.contents);
       if (data.publishing_records) this.setItem('publishing_records', data.publishing_records);
