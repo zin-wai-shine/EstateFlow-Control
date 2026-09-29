@@ -1,18 +1,11 @@
-// EstateFlow Control - Application Settings & Backup (Section 53, 54, 55, 56, 91, 92)
+// EstateFlow Control - Application Settings & Backup (Normal Case, Clean)
 import React, { useState } from 'react';
 import { 
-  FiSettings, 
   FiMoon, 
   FiSun, 
-  FiHardDrive, 
-  FiCpu, 
-  FiEdit, 
   FiDownloadCloud, 
   FiUploadCloud, 
-  FiCheck, 
-  FiInfo, 
-  FiSliders,
-  FiShield
+  FiSliders
 } from 'react-icons/fi';
 import { useApp } from '../context/AppContext';
 import { AppSettings, PromptTemplate } from '../types';
@@ -64,7 +57,7 @@ export const Settings: React.FC = () => {
     a.href = url;
     a.download = `estateflow_control_backup_${new Date().toISOString().split('T')[0]}.json`;
     a.click();
-    addNotification('success', 'Backup Exported', 'Full database snapshot downloaded to disk.');
+    addNotification('success', 'Backup Exported', 'Database snapshot downloaded to disk.');
   };
 
   const handleImportBackup = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,10 +79,10 @@ export const Settings: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
+        <h1 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
           Application Preferences & Settings
         </h1>
         <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
@@ -98,22 +91,22 @@ export const Settings: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-neutral-200/50 dark:border-white/10 pb-2 overflow-x-auto text-xs font-bold">
+      <div className="flex items-center gap-1.5 border-b border-neutral-200 dark:border-white/10 pb-2 overflow-x-auto text-xs font-medium">
         {[
           { id: 'general', label: 'General & Storage' },
           { id: 'appearance', label: 'Appearance & Themes' },
           { id: 'automation', label: 'Automation & Workers' },
           { id: 'prompts', label: 'Prompt Templates' },
           { id: 'backup', label: 'Backup & Recovery' },
-          { id: 'about', label: 'About & Security' }
+          { id: 'about', label: 'About & System' }
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`px-4 py-2 rounded-xl transition-all whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
               activeTab === tab.id
-                ? 'bg-rose-600 text-white shadow-md shadow-rose-600/25'
-                : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/50 dark:hover:bg-white/5'
+                ? 'bg-rose-500/10 text-rose-500 dark:text-rose-400 font-semibold border border-rose-500/20'
+                : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/5'
             }`}
           >
             {tab.label}
@@ -123,32 +116,32 @@ export const Settings: React.FC = () => {
 
       {/* Tab: General & Storage */}
       {activeTab === 'general' && (
-        <div className="glass-panel p-6 rounded-3xl border border-white/10 space-y-5 animate-in fade-in duration-150">
+        <div className="glass-panel p-5 rounded-2xl border border-neutral-200 dark:border-white/10 space-y-4">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-300 mb-1.5">
-              Root Storage Directory (APFS / macOS)
+            <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1">
+              Root Storage Directory
             </label>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <input
                 type="text"
                 value={storagePath}
                 onChange={(e) => setStoragePath(e.target.value)}
-                className="flex-1 px-4 py-2.5 rounded-xl glass-input text-xs font-mono"
+                className="flex-1 px-3.5 py-2 rounded-lg glass-input text-xs font-mono"
               />
               <button
                 onClick={handleSaveAutomation}
-                className="px-4 py-2.5 rounded-xl btn-primary-red text-xs font-bold uppercase"
+                className="px-3.5 py-2 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
               >
                 Save
               </button>
             </div>
-            <p className="text-[11px] text-neutral-400 mt-1.5">
-              Property photos, enhanced deliverables, and marketing copies are automatically indexed in subdirectories here.
+            <p className="text-[11px] text-neutral-400 mt-1">
+              Property photos, enhanced deliverables, and marketing outputs are organized here.
             </p>
           </div>
 
-          <div className="pt-4 border-t border-neutral-200/40 dark:border-white/5 space-y-3">
-            <label className="flex items-center gap-2.5 cursor-pointer text-xs font-medium">
+          <div className="pt-3 border-t border-neutral-100 dark:border-white/5 space-y-2">
+            <label className="flex items-center gap-2 cursor-pointer text-xs font-medium">
               <input
                 type="checkbox"
                 checked={settings.general.confirmOnDestructiveActions}
@@ -161,7 +154,7 @@ export const Settings: React.FC = () => {
                 }}
                 className="w-4 h-4 rounded text-rose-600"
               />
-              <span>Require confirmation before deleting properties and photos</span>
+              <span>Confirm before deleting properties and photos</span>
             </label>
           </div>
         </div>
@@ -169,46 +162,46 @@ export const Settings: React.FC = () => {
 
       {/* Tab: Appearance */}
       {activeTab === 'appearance' && (
-        <div className="glass-panel p-6 rounded-3xl border border-white/10 space-y-6 animate-in fade-in duration-150">
+        <div className="glass-panel p-5 rounded-2xl border border-neutral-200 dark:border-white/10 space-y-4">
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-3">
-              Interface Color Theme
+            <h3 className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-2.5">
+              Color Theme
             </h3>
-            <div className="grid grid-cols-3 gap-4 max-w-md">
+            <div className="grid grid-cols-3 gap-3 max-w-sm">
               <button
                 onClick={() => setTheme('light')}
-                className={`p-4 rounded-2xl border text-center transition-all ${
+                className={`p-3 rounded-xl border text-center transition-colors cursor-pointer ${
                   theme === 'light' 
-                    ? 'border-rose-500 bg-rose-500/10 text-rose-500 font-bold' 
-                    : 'border-white/10 hover:border-white/20 text-neutral-300'
+                    ? 'border-rose-500 bg-rose-500/10 text-rose-500 font-semibold' 
+                    : 'border-neutral-200 dark:border-white/10 text-neutral-400 hover:text-neutral-700 dark:hover:text-white'
                 }`}
               >
-                <FiSun className="w-6 h-6 mx-auto mb-2 text-rose-500" />
-                <span className="text-xs">Light Mode</span>
+                <FiSun className="w-5 h-5 mx-auto mb-1 text-rose-500" />
+                <span className="text-xs">Light</span>
               </button>
 
               <button
                 onClick={() => setTheme('dark')}
-                className={`p-4 rounded-2xl border text-center transition-all ${
+                className={`p-3 rounded-xl border text-center transition-colors cursor-pointer ${
                   theme === 'dark' 
-                    ? 'border-rose-500 bg-rose-500/10 text-rose-500 font-bold' 
-                    : 'border-white/10 hover:border-white/20 text-neutral-300'
+                    ? 'border-rose-500 bg-rose-500/10 text-rose-500 font-semibold' 
+                    : 'border-neutral-200 dark:border-white/10 text-neutral-400 hover:text-neutral-700 dark:hover:text-white'
                 }`}
               >
-                <FiMoon className="w-6 h-6 mx-auto mb-2 text-rose-500" />
-                <span className="text-xs">Dark Mode</span>
+                <FiMoon className="w-5 h-5 mx-auto mb-1 text-rose-500" />
+                <span className="text-xs">Dark</span>
               </button>
 
               <button
                 onClick={() => setTheme('system')}
-                className={`p-4 rounded-2xl border text-center transition-all ${
+                className={`p-3 rounded-xl border text-center transition-colors cursor-pointer ${
                   theme === 'system' 
-                    ? 'border-rose-500 bg-rose-500/10 text-rose-500 font-bold' 
-                    : 'border-white/10 hover:border-white/20 text-neutral-300'
+                    ? 'border-rose-500 bg-rose-500/10 text-rose-500 font-semibold' 
+                    : 'border-neutral-200 dark:border-white/10 text-neutral-400 hover:text-neutral-700 dark:hover:text-white'
                 }`}
               >
-                <FiSliders className="w-6 h-6 mx-auto mb-2 text-rose-500" />
-                <span className="text-xs">Follow System</span>
+                <FiSliders className="w-5 h-5 mx-auto mb-1 text-rose-500" />
+                <span className="text-xs">System</span>
               </button>
             </div>
           </div>
@@ -217,11 +210,11 @@ export const Settings: React.FC = () => {
 
       {/* Tab: Automation & Workers */}
       {activeTab === 'automation' && (
-        <div className="glass-panel p-6 rounded-3xl border border-white/10 space-y-5 animate-in fade-in duration-150">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div className="glass-panel p-5 rounded-2xl border border-neutral-200 dark:border-white/10 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-300 mb-1.5">
-                Active Parallel Enhancement Workers
+              <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1">
+                Parallel Enhancement Workers
               </label>
               <input
                 type="number"
@@ -229,13 +222,13 @@ export const Settings: React.FC = () => {
                 onChange={(e) => setActiveEnhancementWorkers(Number(e.target.value))}
                 min="1"
                 max="8"
-                className="w-full px-4 py-2.5 rounded-xl glass-input text-xs font-bold"
+                className="w-full px-3.5 py-2 rounded-lg glass-input text-xs font-medium"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-300 mb-1.5">
-                Maximum Retry Attempts Before Flagging
+              <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1">
+                Max Retries Before Flagging
               </label>
               <input
                 type="number"
@@ -243,28 +236,28 @@ export const Settings: React.FC = () => {
                 onChange={(e) => setMaxRetries(Number(e.target.value))}
                 min="1"
                 max="5"
-                className="w-full px-4 py-2.5 rounded-xl glass-input text-xs font-bold"
+                className="w-full px-3.5 py-2 rounded-lg glass-input text-xs font-medium"
               />
             </div>
           </div>
 
-          <div className="pt-3 border-t border-neutral-200/40 dark:border-white/5">
-            <label className="flex items-center gap-2.5 cursor-pointer text-xs font-medium">
+          <div className="pt-2 border-t border-neutral-100 dark:border-white/5">
+            <label className="flex items-center gap-2 cursor-pointer text-xs font-medium">
               <input
                 type="checkbox"
                 checked={requireApproval}
                 onChange={(e) => setRequireApproval(e.target.checked)}
                 className="w-4 h-4 rounded text-rose-600"
               />
-              <span className="font-semibold text-neutral-200">
-                Enforce Manual Approval for all Social & Marketplace Publishing (Recommended)
+              <span className="text-neutral-700 dark:text-neutral-200">
+                Require manual approval for publishing
               </span>
             </label>
           </div>
 
           <button
             onClick={handleSaveAutomation}
-            className="px-5 py-2.5 rounded-xl btn-primary-red text-xs font-bold uppercase"
+            className="px-4 py-2 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
           >
             Save Automation Settings
           </button>
@@ -273,40 +266,31 @@ export const Settings: React.FC = () => {
 
       {/* Tab: Prompts */}
       {activeTab === 'prompts' && (
-        <div className="space-y-4 animate-in fade-in duration-150">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-400">
-              Configured Prompt Templates ({prompts.length})
-            </h2>
-          </div>
+        <div className="space-y-3">
+          <h2 className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+            Prompt Templates ({prompts.length})
+          </h2>
 
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {prompts.map((p) => (
-              <div key={p.id} className="glass-card p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-1">
+              <div key={p.id} className="glass-card p-3.5 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-xs text-neutral-900 dark:text-white">
+                    <span className="font-semibold text-xs text-neutral-900 dark:text-neutral-100">
                       {p.name}
                     </span>
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 font-mono">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-white/5 text-neutral-500 font-mono">
                       v{p.version}
                     </span>
                   </div>
                   <p className="text-xs text-neutral-400">
                     {p.purpose}
                   </p>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {p.tokens.map(t => (
-                      <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-400 font-mono">
-                        {`{${t}}`}
-                      </span>
-                    ))}
-                  </div>
                 </div>
 
                 <button
                   onClick={() => setEditingPrompt(p)}
-                  className="px-3 py-1.5 rounded-lg bg-neutral-200/60 dark:bg-white/5 hover:bg-neutral-300 dark:hover:bg-white/10 text-xs font-semibold self-start md:self-auto"
+                  className="px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 text-xs font-medium cursor-pointer self-start md:self-auto"
                 >
                   Edit Template
                 </button>
@@ -314,29 +298,28 @@ export const Settings: React.FC = () => {
             ))}
           </div>
 
-          {/* Prompt Editor Modal */}
           {editingPrompt && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-              <div className="glass-panel p-6 rounded-3xl max-w-2xl w-full space-y-4">
-                <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+              <div className="glass-panel p-5 rounded-2xl max-w-xl w-full space-y-3">
+                <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
                   Edit Template: {editingPrompt.name}
                 </h3>
                 <textarea
                   rows={8}
                   value={editingPrompt.content}
                   onChange={(e) => setEditingPrompt({ ...editingPrompt, content: e.target.value })}
-                  className="w-full p-3 rounded-xl glass-input text-xs font-mono leading-relaxed"
+                  className="w-full p-3 rounded-lg glass-input text-xs font-mono leading-relaxed"
                 />
                 <div className="flex justify-end gap-2">
                   <button
                     onClick={() => setEditingPrompt(null)}
-                    className="px-4 py-2 rounded-xl text-neutral-400 hover:text-white text-xs font-semibold"
+                    className="px-3 py-1.5 rounded-lg text-neutral-400 hover:text-white text-xs font-medium cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSavePrompt}
-                    className="px-5 py-2 rounded-xl btn-primary-red text-xs font-bold uppercase"
+                    className="px-4 py-1.5 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
                   >
                     Save Changes
                   </button>
@@ -349,28 +332,28 @@ export const Settings: React.FC = () => {
 
       {/* Tab: Backup & Recovery */}
       {activeTab === 'backup' && (
-        <div className="glass-panel p-6 rounded-3xl border border-white/10 space-y-6 animate-in fade-in duration-150">
+        <div className="glass-panel p-5 rounded-2xl border border-neutral-200 dark:border-white/10 space-y-4">
           <div>
-            <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
-              SQLite Database Snapshot & Recovery (Section 91 & 92)
+            <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+              Database Snapshot & Recovery
             </h3>
-            <p className="text-xs text-neutral-400 mt-1 max-w-md">
-              Create an immutable snapshot of all properties, job queues, workers, and prompts without copying media files.
+            <p className="text-xs text-neutral-400 mt-0.5 max-w-md">
+              Create a snapshot of properties, job queues, workers, and prompts.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={handleExportBackup}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl btn-primary-red text-xs font-bold uppercase shadow-lg shadow-rose-600/30"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
             >
               <FiDownloadCloud className="w-4 h-4" />
-              <span>Export Full Backup (.json)</span>
+              <span>Export Backup (.json)</span>
             </button>
 
-            <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-200/60 dark:bg-white/5 hover:bg-neutral-300 dark:hover:bg-white/10 text-xs font-bold cursor-pointer transition-colors">
+            <label className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 text-xs font-medium cursor-pointer transition-colors">
               <FiUploadCloud className="w-4 h-4 text-rose-500" />
-              <span>Restore from Backup File</span>
+              <span>Restore Backup</span>
               <input
                 type="file"
                 accept=".json"
@@ -384,22 +367,22 @@ export const Settings: React.FC = () => {
 
       {/* Tab: About */}
       {activeTab === 'about' && (
-        <div className="glass-panel p-6 rounded-3xl border border-white/10 space-y-4 animate-in fade-in duration-150">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-600 to-rose-500 flex items-center justify-center text-white font-black text-sm">
+        <div className="glass-panel p-5 rounded-2xl border border-neutral-200 dark:border-white/10 space-y-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-rose-600 flex items-center justify-center text-white font-bold text-xs">
               EF
             </div>
             <div>
-              <h3 className="font-extrabold text-sm text-neutral-900 dark:text-white">
+              <h3 className="font-semibold text-sm text-neutral-900 dark:text-neutral-100">
                 EstateFlow Control
               </h3>
               <span className="text-xs text-neutral-400">
-                Version 1.0.0 Production Release
+                Version 1.0.0
               </span>
             </div>
           </div>
           <p className="text-xs text-neutral-400 leading-relaxed max-w-md">
-            Built as a sandboxed macOS desktop application using Tauri 2, React, TypeScript, and OpenClaw automation bridge. Zero external CDNs. Offline first.
+            Sandboxed macOS desktop application using Tauri 2, React, TypeScript, and OpenClaw automation bridge.
           </p>
         </div>
       )}

@@ -1,4 +1,4 @@
-// EstateFlow Control - Content Studio (Section 40)
+// EstateFlow Control - Content Studio (Normal Case, Clean)
 import React, { useState, useEffect } from 'react';
 import { 
   FiEdit3, 
@@ -7,7 +7,6 @@ import {
   FiRefreshCw, 
   FiSave, 
   FiShare2, 
-  FiTag, 
   FiFileText 
 } from 'react-icons/fi';
 import { useApp } from '../context/AppContext';
@@ -23,7 +22,6 @@ export const ContentStudio: React.FC = () => {
   const selectedProperty = properties.find(p => p.id === selectedPropertyId);
   const [content, setContent] = useState<GeneratedContent | null>(null);
 
-  // Form states
   const [facebookPost, setFacebookPost] = useState('');
   const [tiktokCaption, setTiktokCaption] = useState('');
   const [marketplaceTitle, setMarketplaceTitle] = useState('');
@@ -51,7 +49,7 @@ export const ContentStudio: React.FC = () => {
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
-    addNotification('info', 'Copied to Clipboard', `Copied ${key.replace('_', ' ')}.`);
+    addNotification('info', 'Copied to Clipboard', `Copied text.`);
     setTimeout(() => setCopiedKey(null), 2000);
   };
 
@@ -72,33 +70,33 @@ export const ContentStudio: React.FC = () => {
     };
     db.saveContent(updatedContent);
     setContent(updatedContent);
-    addNotification('success', 'Content Saved', 'Listing copywriting changes saved successfully.');
+    addNotification('success', 'Content Saved', 'Listing copywriting changes saved.');
   };
 
   const handleRegenerate = () => {
     if (!selectedProperty) return;
     automationEngine.queueContentGeneration(selectedProperty);
-    addNotification('info', 'Synthesis Queued', `Regenerating smart copy for ${selectedProperty.projectName}...`);
+    addNotification('info', 'Synthesis Queued', `Regenerating copy for ${selectedProperty.projectName}...`);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
-            Content Studio & AI Copywriting
+          <h1 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
+            Content Studio & Copywriting
           </h1>
           <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-            Format high-converting captions, Marketplace listings, and hashtags for social channels.
+            Format captions, Marketplace listings, and hashtags for social channels.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <select
             value={selectedPropertyId}
             onChange={(e) => setSelectedPropertyId(e.target.value)}
-            className="px-3.5 py-2 rounded-xl glass-input text-xs font-bold dark:bg-neutral-900 cursor-pointer"
+            className="px-3 py-1.5 rounded-lg glass-input text-xs font-medium dark:bg-neutral-900 cursor-pointer"
           >
             {properties.map(p => (
               <option key={p.id} value={p.id}>{p.projectName}</option>
@@ -107,7 +105,7 @@ export const ContentStudio: React.FC = () => {
 
           <button
             onClick={handleRegenerate}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-200/60 dark:bg-white/5 hover:bg-neutral-300 dark:hover:bg-white/10 text-xs font-bold transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 text-xs font-medium transition-colors cursor-pointer"
           >
             <FiRefreshCw className="w-3.5 h-3.5 text-rose-500" />
             <span>Regenerate Copy</span>
@@ -115,7 +113,7 @@ export const ContentStudio: React.FC = () => {
 
           <button
             onClick={handleSave}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl btn-primary-red text-xs font-bold uppercase shadow-lg shadow-rose-600/30"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
           >
             <FiSave className="w-3.5 h-3.5" />
             <span>Save Edits</span>
@@ -124,79 +122,79 @@ export const ContentStudio: React.FC = () => {
       </div>
 
       {content ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {/* Facebook Post Copy */}
-          <div className="glass-panel p-5 rounded-3xl border border-white/10 space-y-3">
+          <div className="glass-panel p-4 rounded-2xl border border-neutral-200 dark:border-white/10 space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-xs font-bold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+              <h2 className="text-xs font-semibold text-neutral-900 dark:text-neutral-100 flex items-center gap-1.5">
                 <FiFileText className="text-rose-500" />
                 <span>Facebook Post Copy</span>
               </h2>
               <button
                 onClick={() => handleCopy(facebookPost, 'facebook_post')}
-                className="flex items-center gap-1.5 text-xs text-rose-500 hover:text-rose-600 font-semibold"
+                className="flex items-center gap-1 text-xs text-rose-500 hover:text-rose-600 font-medium cursor-pointer"
               >
                 {copiedKey === 'facebook_post' ? <FiCheck className="w-3.5 h-3.5 text-emerald-500" /> : <FiCopy className="w-3.5 h-3.5" />}
-                <span>{copiedKey === 'facebook_post' ? 'Copied!' : 'Copy Text'}</span>
+                <span>{copiedKey === 'facebook_post' ? 'Copied' : 'Copy'}</span>
               </button>
             </div>
             <textarea
               rows={12}
               value={facebookPost}
               onChange={(e) => setFacebookPost(e.target.value)}
-              className="w-full p-3.5 rounded-xl glass-input text-xs font-mono leading-relaxed"
+              className="w-full p-3 rounded-lg glass-input text-xs font-mono leading-relaxed"
             />
           </div>
 
           {/* Facebook Marketplace Listing */}
-          <div className="glass-panel p-5 rounded-3xl border border-white/10 space-y-4">
+          <div className="glass-panel p-4 rounded-2xl border border-neutral-200 dark:border-white/10 space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-xs font-bold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+              <h2 className="text-xs font-semibold text-neutral-900 dark:text-neutral-100 flex items-center gap-1.5">
                 <FiShare2 className="text-rose-500" />
                 <span>Facebook Marketplace Listing</span>
               </h2>
               <button
                 onClick={() => handleCopy(`${marketplaceTitle}\n\n${marketplaceDescription}`, 'marketplace')}
-                className="flex items-center gap-1.5 text-xs text-rose-500 hover:text-rose-600 font-semibold"
+                className="flex items-center gap-1 text-xs text-rose-500 hover:text-rose-600 font-medium cursor-pointer"
               >
                 {copiedKey === 'marketplace' ? <FiCheck className="w-3.5 h-3.5 text-emerald-500" /> : <FiCopy className="w-3.5 h-3.5" />}
-                <span>{copiedKey === 'marketplace' ? 'Copied!' : 'Copy Listing'}</span>
+                <span>{copiedKey === 'marketplace' ? 'Copied' : 'Copy'}</span>
               </button>
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-neutral-400 mb-1">
-                Optimized Title (Max 65 characters)
+              <label className="block text-[11px] font-medium text-neutral-400 mb-1">
+                Title (Max 65 characters)
               </label>
               <input
                 type="text"
                 value={marketplaceTitle}
                 onChange={(e) => setMarketplaceTitle(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl glass-input text-xs font-bold"
+                className="w-full px-3 py-1.5 rounded-lg glass-input text-xs font-medium"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-neutral-400 mb-1">
+              <label className="block text-[11px] font-medium text-neutral-400 mb-1">
                 Listing Description
               </label>
               <textarea
-                rows={7}
+                rows={6}
                 value={marketplaceDescription}
                 onChange={(e) => setMarketplaceDescription(e.target.value)}
-                className="w-full p-3 rounded-xl glass-input text-xs font-mono leading-relaxed"
+                className="w-full p-2.5 rounded-lg glass-input text-xs font-mono leading-relaxed"
               />
             </div>
 
             {/* TikTok Caption */}
-            <div className="pt-2 border-t border-neutral-200/40 dark:border-white/5">
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="text-[11px] font-semibold text-neutral-400">
+            <div className="pt-2 border-t border-neutral-100 dark:border-white/5">
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-[11px] font-medium text-neutral-400">
                   TikTok Tour Caption & Tags
                 </label>
                 <button
                   onClick={() => handleCopy(tiktokCaption, 'tiktok')}
-                  className="text-[11px] text-rose-500 font-semibold flex items-center gap-1"
+                  className="text-[11px] text-rose-500 font-medium flex items-center gap-1 cursor-pointer"
                 >
                   <FiCopy className="w-3 h-3" />
                   <span>Copy</span>
@@ -206,15 +204,15 @@ export const ContentStudio: React.FC = () => {
                 type="text"
                 value={tiktokCaption}
                 onChange={(e) => setTiktokCaption(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl glass-input text-xs font-mono"
+                className="w-full px-3 py-1.5 rounded-lg glass-input text-xs font-mono"
               />
             </div>
           </div>
         </div>
       ) : (
-        <div className="p-12 text-center glass-panel rounded-3xl space-y-4">
-          <FiEdit3 className="w-10 h-10 text-rose-500 mx-auto" />
-          <h3 className="text-base font-bold text-neutral-900 dark:text-white">
+        <div className="p-10 text-center glass-panel rounded-2xl space-y-3">
+          <FiEdit3 className="w-8 h-8 text-rose-500 mx-auto" />
+          <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
             No copy generated yet for {selectedProperty?.projectName}
           </h3>
           <p className="text-xs text-neutral-400 max-w-sm mx-auto">
@@ -222,7 +220,7 @@ export const ContentStudio: React.FC = () => {
           </p>
           <button
             onClick={handleRegenerate}
-            className="px-6 py-2.5 rounded-xl btn-primary-red text-xs font-bold uppercase"
+            className="px-4 py-2 rounded-lg btn-primary-red text-xs font-medium cursor-pointer"
           >
             Synthesize Copywriting
           </button>

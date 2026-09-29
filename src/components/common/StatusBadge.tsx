@@ -1,4 +1,4 @@
-// EstateFlow Control - StatusBadge Component (Zero Emoji, Accessible Icon+Text)
+// EstateFlow Control - StatusBadge Component (Normal Case, Calm Colors, Zero Emoji)
 import React from 'react';
 import { 
   FiCheckCircle, 
@@ -6,8 +6,6 @@ import {
   FiAlertCircle, 
   FiAlertTriangle, 
   FiRefreshCw, 
-  FiPlay, 
-  FiPause, 
   FiArchive, 
   FiTag, 
   FiLayers 
@@ -22,7 +20,7 @@ interface StatusBadgeProps {
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md', className = '' }) => {
   let label = status.replace(/_/g, ' ');
-  label = label.charAt(0).toUpperCase() + label.slice(1);
+  label = label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
 
   let icon = <FiClock className="shrink-0" />;
   let colorClasses = 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20';
@@ -35,7 +33,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md', c
     case 'published':
     case 'healthy':
       icon = <FiCheckCircle className="shrink-0 text-emerald-500" />;
-      colorClasses = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25';
+      colorClasses = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
       break;
 
     // Blue / Active / Running / Queued
@@ -47,7 +45,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md', c
     case 'publishing':
     case 'busy':
       icon = <FiRefreshCw className="shrink-0 text-blue-400 animate-spin" />;
-      colorClasses = 'bg-blue-500/10 text-blue-400 border-blue-500/25';
+      colorClasses = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
       break;
 
     case 'queued':
@@ -55,7 +53,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md', c
     case 'pending':
     case 'pending_approval':
       icon = <FiClock className="shrink-0 text-amber-400" />;
-      colorClasses = 'bg-amber-500/10 text-amber-400 border-amber-500/25';
+      colorClasses = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
       break;
 
     // Amber / Warning / Retrying
@@ -63,7 +61,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md', c
     case 'reserved':
     case 'needs_review':
       icon = <FiAlertTriangle className="shrink-0 text-amber-400" />;
-      colorClasses = 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+      colorClasses = 'bg-amber-500/10 text-amber-300 border-amber-500/25';
       break;
 
     // Red / Error / Failed
@@ -72,37 +70,37 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md', c
     case 'down':
     case 'login_required':
       icon = <FiAlertCircle className="shrink-0 text-rose-500" />;
-      colorClasses = 'bg-rose-500/10 text-rose-400 border-rose-500/25';
+      colorClasses = 'bg-rose-500/10 text-rose-400 border-rose-500/20';
       break;
 
-    // Violet / Secondary
+    // Muted purple
     case 'rented':
       icon = <FiTag className="shrink-0 text-purple-400" />;
-      colorClasses = 'bg-purple-500/10 text-purple-400 border-purple-500/25';
+      colorClasses = 'bg-purple-500/10 text-purple-400 border-purple-500/20';
       break;
 
     case 'archived':
     case 'cancelled':
     case 'paused':
       icon = <FiArchive className="shrink-0 text-neutral-400" />;
-      colorClasses = 'bg-neutral-500/15 text-neutral-400 border-neutral-500/20';
+      colorClasses = 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20';
       break;
 
     case 'draft':
       icon = <FiLayers className="shrink-0 text-neutral-400" />;
-      colorClasses = 'bg-neutral-500/15 text-neutral-300 border-neutral-500/20';
+      colorClasses = 'bg-neutral-500/10 text-neutral-300 border-neutral-500/20';
       break;
   }
 
   const sizeClasses = size === 'sm' 
     ? 'text-xs px-2 py-0.5 gap-1.5' 
     : size === 'lg' 
-      ? 'text-sm px-3.5 py-1.5 gap-2 font-medium' 
-      : 'text-xs px-2.5 py-1 gap-1.5 font-medium';
+      ? 'text-sm px-3 py-1 gap-2 font-medium' 
+      : 'text-xs px-2.5 py-0.5 gap-1.5 font-medium';
 
   return (
     <span
-      className={`inline-flex items-center rounded-full border tracking-wide uppercase font-semibold ${sizeClasses} ${colorClasses} ${className}`}
+      className={`inline-flex items-center rounded-md border font-medium ${sizeClasses} ${colorClasses} ${className}`}
     >
       {icon}
       <span>{label}</span>
