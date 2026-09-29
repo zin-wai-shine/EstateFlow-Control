@@ -323,7 +323,7 @@ export const PropertiesLink: React.FC = () => {
                 <th className="py-2.5 px-4 w-32">Links Count</th>
                 <th className="py-2.5 px-4">Sources Preview</th>
                 <th className="py-2.5 px-4 w-36">Date Added</th>
-                <th className="py-2.5 px-4 w-52 text-right">Actions</th>
+                <th className="py-2.5 px-4 w-36 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
@@ -400,17 +400,6 @@ export const PropertiesLink: React.FC = () => {
                             <FiEye className="w-3 h-3 text-rose-500" />
                             <span>View</span>
                           </button>
-
-                          {group.links.length > 1 && (
-                            <button
-                              onClick={() => handleOpenAllLinks(group)}
-                              title="Open all links in browser"
-                              className="px-2 py-1 rounded text-[11px] font-medium text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1 cursor-pointer"
-                            >
-                              <FiExternalLink className="w-3 h-3" />
-                              <span>Open all</span>
-                            </button>
-                          )}
 
                           <button
                             onClick={() => handleCopyAllLinks(group)}
