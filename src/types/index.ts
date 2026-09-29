@@ -453,3 +453,13 @@ export interface ProcessRun {
   errorMessage?: string;
 }
 
+export type PropertyLinkSource = 'owner' | 'agent';
+
+export interface PropertyLink {
+  id: string;
+  sourceType: PropertyLinkSource;
+  url: string;
+  createdAt: string;
+  updatedAt: string;
+}
+

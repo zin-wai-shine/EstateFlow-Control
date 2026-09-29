@@ -11,6 +11,7 @@ import { Processes } from './pages/Processes';
 import { ProcessBuilder } from './pages/ProcessBuilder';
 import { ProcessRunModal } from './pages/ProcessRunModal';
 import { BrowserWorkers } from './pages/BrowserWorkers';
+import { PropertiesLink } from './pages/PropertiesLink';
 import { ContentStudio } from './pages/ContentStudio';
 import { Publishing } from './pages/Publishing';
 import { JobsQueue } from './pages/JobsQueue';
@@ -48,6 +49,8 @@ const AppContent: React.FC = () => {
         return <ProcessBuilder />;
       case 'browser_workers':
         return <BrowserWorkers />;
+      case 'properties_link':
+        return <PropertiesLink />;
       case 'content_studio':
         return <ContentStudio />;
       case 'publishing':
