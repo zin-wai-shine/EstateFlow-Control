@@ -11,7 +11,10 @@ import {
   ActivityEvent, 
   TechnicalLog, 
   AppSettings, 
-  User 
+  User,
+  Process,
+  ProcessStep,
+  ProcessRun
 } from '../types';
 
 const DB_KEY_PREFIX = 'estateflow_db_';
@@ -164,6 +167,7 @@ export const DEFAULT_WORKERS: AutomationWorker[] = [
     profileId: 'prof-a',
     profileFriendlyName: 'Profile A - Primary Enhancement',
     type: 'enhancement',
+    role: 'image_enhancement',
     status: 'ready',
     totalJobsProcessed: 142,
     successRate: 98.6,
@@ -175,6 +179,7 @@ export const DEFAULT_WORKERS: AutomationWorker[] = [
     profileId: 'prof-a',
     profileFriendlyName: 'Profile A - Primary Enhancement',
     type: 'enhancement',
+    role: 'image_enhancement',
     status: 'ready',
     totalJobsProcessed: 128,
     successRate: 97.8,
@@ -186,6 +191,7 @@ export const DEFAULT_WORKERS: AutomationWorker[] = [
     profileId: 'prof-b',
     profileFriendlyName: 'Profile B - Secondary Enhancement',
     type: 'enhancement',
+    role: 'image_enhancement',
     status: 'ready',
     totalJobsProcessed: 95,
     successRate: 98.9,
@@ -197,6 +203,7 @@ export const DEFAULT_WORKERS: AutomationWorker[] = [
     profileId: 'prof-c',
     profileFriendlyName: 'Profile C - Creative & Hero',
     type: 'hero_facebook',
+    role: 'facebook_hero',
     status: 'ready',
     totalJobsProcessed: 64,
     successRate: 96.5,
@@ -208,10 +215,329 @@ export const DEFAULT_WORKERS: AutomationWorker[] = [
     profileId: 'prof-d',
     profileFriendlyName: 'Profile D - Social Publishing',
     type: 'publishing',
+    role: 'facebook_publishing',
     status: 'ready',
     totalJobsProcessed: 52,
     successRate: 100.0,
     startedAt: new Date().toISOString()
+  }
+];
+
+export const DEFAULT_PROCESSES: Process[] = [
+  {
+    id: 'proc-img-enh',
+    name: 'Property Image Enhancement',
+    description: 'Enhance high-resolution interior and exterior property photos sequentially or in parallel using ChatGPT worker tabs.',
+    category: 'image_enhancement',
+    status: 'ready',
+    inputType: 'original_images',
+    outputType: 'enhanced_image',
+    processingMode: 'each_image',
+    steps: [
+      {
+        id: 'step-enh-1',
+        order: 1,
+        name: 'Enhance Image',
+        type: 'image_enhancement',
+        input: 'original_images',
+        profileId: 'prof-a',
+        workerAssignmentMode: 'any_available',
+        promptTemplateId: 'pt-1',
+        expectedResult: 'High dynamic range, well-lit architectural photo with balanced daylight',
+        downloadRequirement: true,
+        retryPolicy: { maxRetries: 3 },
+        timeoutSeconds: 120,
+        isEnabled: true
+      },
+      {
+        id: 'step-enh-2',
+        order: 2,
+        name: 'Verify Download',
+        type: 'download_result',
+        input: 'enhanced_images',
+        profileId: 'prof-a',
+        workerAssignmentMode: 'any_available',
+        downloadRequirement: true,
+        retryPolicy: { maxRetries: 2 },
+        timeoutSeconds: 30,
+        isEnabled: true
+      },
+      {
+        id: 'step-enh-3',
+        order: 3,
+        name: 'Save Enhanced Asset',
+        type: 'file_operation',
+        input: 'enhanced_images',
+        profileId: 'prof-a',
+        workerAssignmentMode: 'any_available',
+        downloadRequirement: false,
+        retryPolicy: { maxRetries: 1 },
+        timeoutSeconds: 15,
+        isEnabled: true
+      }
+    ],
+    runCount: 24,
+    successCount: 23,
+    failureCount: 1,
+    lastRunAt: new Date(Date.now() - 3600000 * 5).toISOString(),
+    createdAt: new Date(Date.now() - 3600000 * 24 * 7).toISOString(),
+    updatedAt: new Date(Date.now() - 3600000 * 5).toISOString()
+  },
+  {
+    id: 'proc-fb-hero',
+    name: 'Facebook Hero Creation',
+    description: 'Synthesize attention-grabbing 1:1 and 4:5 social hero covers with typography from enhanced property photos.',
+    category: 'hero_generation',
+    status: 'ready',
+    inputType: 'enhanced_images',
+    outputType: 'facebook_hero',
+    processingMode: 'batch',
+    steps: [
+      {
+        id: 'step-fb-1',
+        order: 1,
+        name: 'Generate Hero Prompt',
+        type: 'prompt_generation',
+        input: 'enhanced_images',
+        profileId: 'prof-c',
+        workerAssignmentMode: 'specific',
+        workerId: 'w-4',
+        promptTemplateId: 'pt-2',
+        expectedResult: 'Composition-optimized hero banner prompt matching luxury tone',
+        downloadRequirement: false,
+        retryPolicy: { maxRetries: 2 },
+        timeoutSeconds: 45,
+        isEnabled: true
+      },
+      {
+        id: 'step-fb-2',
+        order: 2,
+        name: 'Generate Hero Image',
+        type: 'hero_generation',
+        input: 'prompt',
+        profileId: 'prof-c',
+        workerAssignmentMode: 'specific',
+        workerId: 'w-4',
+        expectedResult: 'Rendered 1:1 high resolution cover asset ready for Facebook Ad and feed placement',
+        downloadRequirement: true,
+        retryPolicy: { maxRetries: 2 },
+        timeoutSeconds: 90,
+        isEnabled: true
+      }
+    ],
+    runCount: 12,
+    successCount: 12,
+    failureCount: 0,
+    lastRunAt: new Date(Date.now() - 3600000 * 12).toISOString(),
+    createdAt: new Date(Date.now() - 3600000 * 24 * 5).toISOString(),
+    updatedAt: new Date(Date.now() - 3600000 * 12).toISOString()
+  },
+  {
+    id: 'proc-tt-hero',
+    name: 'TikTok 9:16 Vertical Hero',
+    description: 'Transform horizontal photos into high-converting 9:16 vertical full-bleed cover frames for TikTok and Reels.',
+    category: 'hero_generation',
+    status: 'ready',
+    inputType: 'enhanced_images',
+    outputType: 'tiktok_hero',
+    processingMode: 'batch',
+    steps: [
+      {
+        id: 'step-tt-1',
+        order: 1,
+        name: 'Generate TikTok Hero Prompt',
+        type: 'prompt_generation',
+        input: 'enhanced_images',
+        profileId: 'prof-c',
+        workerAssignmentMode: 'specific',
+        workerId: 'w-4',
+        promptTemplateId: 'pt-3',
+        expectedResult: '9:16 framed prompt with vertical focal points',
+        downloadRequirement: false,
+        retryPolicy: { maxRetries: 2 },
+        timeoutSeconds: 45,
+        isEnabled: true
+      },
+      {
+        id: 'step-tt-2',
+        order: 2,
+        name: 'Generate 9:16 Vertical Cover',
+        type: 'hero_generation',
+        input: 'prompt',
+        profileId: 'prof-c',
+        workerAssignmentMode: 'specific',
+        workerId: 'w-4',
+        expectedResult: '9:16 vertical resolution cover image',
+        downloadRequirement: true,
+        retryPolicy: { maxRetries: 2 },
+        timeoutSeconds: 90,
+        isEnabled: true
+      }
+    ],
+    runCount: 8,
+    successCount: 7,
+    failureCount: 1,
+    lastRunAt: new Date(Date.now() - 3600000 * 18).toISOString(),
+    createdAt: new Date(Date.now() - 3600000 * 24 * 4).toISOString(),
+    updatedAt: new Date(Date.now() - 3600000 * 18).toISOString()
+  },
+  {
+    id: 'proc-content-syn',
+    name: 'Social Content & Copywriting Synthesis',
+    description: 'Draft multi-channel copywriting including Facebook posts, TikTok captions, hashtags, and Marketplace listings.',
+    category: 'content_generation',
+    status: 'ready',
+    inputType: 'property_details',
+    outputType: 'marketplace_content',
+    processingMode: 'single',
+    steps: [
+      {
+        id: 'step-cnt-1',
+        order: 1,
+        name: 'Generate Social & Marketplace Copy',
+        type: 'content_generation',
+        input: 'property_details',
+        profileId: 'prof-d',
+        workerAssignmentMode: 'specific',
+        workerId: 'w-5',
+        promptTemplateId: 'pt-6',
+        expectedResult: 'Formatted text package ready for Content Studio review',
+        downloadRequirement: false,
+        retryPolicy: { maxRetries: 2 },
+        timeoutSeconds: 60,
+        isEnabled: true
+      }
+    ],
+    runCount: 15,
+    successCount: 15,
+    failureCount: 0,
+    lastRunAt: new Date(Date.now() - 3600000 * 6).toISOString(),
+    createdAt: new Date(Date.now() - 3600000 * 24 * 6).toISOString(),
+    updatedAt: new Date(Date.now() - 3600000 * 6).toISOString()
+  },
+  {
+    id: 'proc-complete-prep',
+    name: 'Complete Property Preparation',
+    description: 'End-to-end automated pipeline executing image enhancement, hero banner generation, content drafting, and publishing staging.',
+    category: 'property_workflow',
+    status: 'ready',
+    inputType: 'property',
+    outputType: 'published_listing',
+    processingMode: 'batch',
+    steps: [
+      {
+        id: 'step-comp-1',
+        order: 1,
+        name: 'Enhance Original Photos',
+        type: 'image_enhancement',
+        input: 'original_images',
+        profileId: 'prof-a',
+        workerAssignmentMode: 'any_available',
+        promptTemplateId: 'pt-1',
+        expectedResult: 'All uploaded photos enhanced and saved',
+        downloadRequirement: true,
+        retryPolicy: { maxRetries: 3 },
+        timeoutSeconds: 180,
+        isEnabled: true
+      },
+      {
+        id: 'step-comp-2',
+        order: 2,
+        name: 'Generate Facebook Hero',
+        type: 'hero_generation',
+        input: 'enhanced_images',
+        profileId: 'prof-c',
+        workerAssignmentMode: 'specific',
+        workerId: 'w-4',
+        promptTemplateId: 'pt-2',
+        expectedResult: '1:1 Hero Cover Asset',
+        downloadRequirement: true,
+        retryPolicy: { maxRetries: 2 },
+        timeoutSeconds: 90,
+        isEnabled: true
+      },
+      {
+        id: 'step-comp-3',
+        order: 3,
+        name: 'Generate TikTok 9:16 Hero',
+        type: 'hero_generation',
+        input: 'enhanced_images',
+        profileId: 'prof-c',
+        workerAssignmentMode: 'specific',
+        workerId: 'w-4',
+        promptTemplateId: 'pt-3',
+        expectedResult: '9:16 Vertical Hero Asset',
+        downloadRequirement: true,
+        retryPolicy: { maxRetries: 2 },
+        timeoutSeconds: 90,
+        isEnabled: true
+      },
+      {
+        id: 'step-comp-4',
+        order: 4,
+        name: 'Generate Copywriting & Captions',
+        type: 'content_generation',
+        input: 'property_details',
+        profileId: 'prof-d',
+        workerAssignmentMode: 'specific',
+        workerId: 'w-5',
+        promptTemplateId: 'pt-6',
+        expectedResult: 'Multi-channel copy draft',
+        downloadRequirement: false,
+        retryPolicy: { maxRetries: 2 },
+        timeoutSeconds: 60,
+        isEnabled: true
+      }
+    ],
+    runCount: 6,
+    successCount: 6,
+    failureCount: 0,
+    lastRunAt: new Date(Date.now() - 3600000 * 24).toISOString(),
+    createdAt: new Date(Date.now() - 3600000 * 24 * 7).toISOString(),
+    updatedAt: new Date(Date.now() - 3600000 * 24).toISOString()
+  }
+];
+
+export const DEFAULT_PROCESS_RUNS: ProcessRun[] = [
+  {
+    id: 'RUN-000142',
+    processId: 'proc-img-enh',
+    processName: 'Property Image Enhancement',
+    propertyId: 'prop-1',
+    propertyName: 'The Monument Thong Lo',
+    status: 'completed',
+    currentStepOrder: 3,
+    totalSteps: 3,
+    jobsCreated: 3,
+    jobsCompleted: 3,
+    jobsFailed: 0,
+    sourceImageIds: ['img-1', 'img-2', 'img-3'],
+    activeWorkerIds: [],
+    queueImageCount: 0,
+    completedImageCount: 3,
+    totalImageCount: 3,
+    startedAt: new Date(Date.now() - 3600000 * 5).toISOString(),
+    completedAt: new Date(Date.now() - 3600000 * 5 + 184000).toISOString()
+  },
+  {
+    id: 'RUN-000141',
+    processId: 'proc-fb-hero',
+    processName: 'Facebook Hero Creation',
+    propertyId: 'prop-2',
+    propertyName: 'Scope Langsuan',
+    status: 'completed',
+    currentStepOrder: 2,
+    totalSteps: 2,
+    jobsCreated: 2,
+    jobsCompleted: 2,
+    jobsFailed: 0,
+    sourceImageIds: ['img-4', 'img-5'],
+    activeWorkerIds: [],
+    queueImageCount: 0,
+    completedImageCount: 2,
+    totalImageCount: 2,
+    startedAt: new Date(Date.now() - 3600000 * 12).toISOString(),
+    completedAt: new Date(Date.now() - 3600000 * 12 + 115000).toISOString()
   }
 ];
 
@@ -403,6 +729,14 @@ class LocalDatabase {
 
     if (!this.getItem<AutomationWorker[] | null>('workers', null)) {
       this.setItem('workers', DEFAULT_WORKERS);
+    }
+
+    if (!this.getItem<Process[] | null>('processes', null)) {
+      this.setItem('processes', DEFAULT_PROCESSES);
+    }
+
+    if (!this.getItem<ProcessRun[] | null>('process_runs', null)) {
+      this.setItem('process_runs', DEFAULT_PROCESS_RUNS);
     }
 
     if (!this.getItem<Property[] | null>('properties', null)) {
@@ -728,6 +1062,95 @@ class LocalDatabase {
     this.setItem('settings', settings);
   }
 
+  // --- PROCESSES ---
+  public getProcesses(includeArchived = false): Process[] {
+    const list = this.getItem<Process[]>('processes', DEFAULT_PROCESSES);
+    return includeArchived ? list : list.filter(p => !p.isArchived);
+  }
+
+  public getProcess(id: string): Process | undefined {
+    return this.getItem<Process[]>('processes', DEFAULT_PROCESSES).find(p => p.id === id);
+  }
+
+  public saveProcess(process: Process): void {
+    const list = this.getItem<Process[]>('processes', DEFAULT_PROCESSES);
+    const index = list.findIndex(p => p.id === process.id);
+    if (index >= 0) {
+      list[index] = { ...process, updatedAt: new Date().toISOString() };
+    } else {
+      list.unshift({ ...process, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+    }
+    this.setItem('processes', list);
+  }
+
+  public duplicateProcess(id: string, newName?: string): Process | undefined {
+    const original = this.getProcess(id);
+    if (!original) return undefined;
+    const duplicated: Process = {
+      ...original,
+      id: 'proc-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 6),
+      name: newName || `${original.name} (Copy)`,
+      status: 'ready',
+      runCount: 0,
+      successCount: 0,
+      failureCount: 0,
+      lastRunAt: undefined,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.saveProcess(duplicated);
+    return duplicated;
+  }
+
+  public archiveProcess(id: string): void {
+    const process = this.getProcess(id);
+    if (process) {
+      this.saveProcess({ ...process, isArchived: true, status: 'archived' });
+    }
+  }
+
+  public unarchiveProcess(id: string): void {
+    const process = this.getProcess(id);
+    if (process) {
+      this.saveProcess({ ...process, isArchived: false, status: 'ready' });
+    }
+  }
+
+  public deleteProcess(id: string): boolean {
+    const activeRuns = this.getProcessRuns(id).filter(r => r.status === 'running' || r.status === 'queued');
+    if (activeRuns.length > 0) {
+      return false;
+    }
+    const list = this.getItem<Process[]>('processes', DEFAULT_PROCESSES).filter(p => p.id !== id);
+    this.setItem('processes', list);
+    return true;
+  }
+
+  // --- PROCESS RUNS ---
+  public getProcessRuns(processId?: string, propertyId?: string): ProcessRun[] {
+    const all = this.getItem<ProcessRun[]>('process_runs', DEFAULT_PROCESS_RUNS);
+    return all.filter(r => {
+      if (processId && r.processId !== processId) return false;
+      if (propertyId && r.propertyId !== propertyId) return false;
+      return true;
+    });
+  }
+
+  public getProcessRun(id: string): ProcessRun | undefined {
+    return this.getItem<ProcessRun[]>('process_runs', DEFAULT_PROCESS_RUNS).find(r => r.id === id);
+  }
+
+  public saveProcessRun(run: ProcessRun): void {
+    const list = this.getItem<ProcessRun[]>('process_runs', DEFAULT_PROCESS_RUNS);
+    const index = list.findIndex(r => r.id === run.id);
+    if (index >= 0) {
+      list[index] = run;
+    } else {
+      list.unshift(run);
+    }
+    this.setItem('process_runs', list);
+  }
+
   // --- BACKUP & RESTORE ---
   public exportBackup(): string {
     const fullBackup = {
@@ -738,6 +1161,8 @@ class LocalDatabase {
       profiles: this.getProfiles(),
       workers: this.getWorkers(),
       jobs: this.getJobs(),
+      processes: this.getProcesses(true),
+      process_runs: this.getProcessRuns(),
       prompts: this.getPrompts(),
       contents: this.getItem<GeneratedContent[]>('contents', []),
       publishing_records: this.getPublishingRecords(),
@@ -753,6 +1178,8 @@ class LocalDatabase {
       if (data.images) this.setItem('images', data.images);
       if (data.profiles) this.setItem('profiles', data.profiles);
       if (data.workers) this.setItem('workers', data.workers);
+      if (data.processes) this.setItem('processes', data.processes);
+      if (data.process_runs) this.setItem('process_runs', data.process_runs);
       if (data.prompts) this.setItem('prompts', data.prompts);
       if (data.contents) this.setItem('contents', data.contents);
       if (data.publishing_records) this.setItem('publishing_records', data.publishing_records);

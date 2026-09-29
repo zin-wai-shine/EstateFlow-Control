@@ -58,60 +58,67 @@ export const JobsQueue: React.FC = () => {
       </div>
 
       {/* Table of Jobs */}
-      <div className="glass-panel rounded-xl overflow-hidden">
-        <table className="w-full text-left text-xs">
+      <div className="glass-panel rounded-xl overflow-x-auto">
+        <table className="w-full text-left text-xs min-w-[750px]">
           <thead className="bg-neutral-100 dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-800 text-neutral-500 dark:text-neutral-400 font-medium">
             <tr>
-              <th className="py-2.5 px-4">Job & Task</th>
-              <th className="py-2.5 px-4">Property</th>
-              <th className="py-2.5 px-4">Status</th>
-              <th className="py-2.5 px-4">Assigned Worker</th>
-              <th className="py-2.5 px-4">Progress / Output</th>
-              <th className="py-2.5 px-4 text-right">Actions</th>
+              <th className="py-2.5 px-3.5">Job</th>
+              <th className="py-2.5 px-3.5">Process</th>
+              <th className="py-2.5 px-3.5">Step</th>
+              <th className="py-2.5 px-3.5">Property</th>
+              <th className="py-2.5 px-3.5">Image</th>
+              <th className="py-2.5 px-3.5">Worker</th>
+              <th className="py-2.5 px-3.5">Status</th>
+              <th className="py-2.5 px-3.5">Started</th>
+              <th className="py-2.5 px-3.5 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
             {filteredJobs.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-8 text-center text-neutral-400">
+                <td colSpan={9} className="py-8 text-center text-neutral-400">
                   No jobs match the current filter.
                 </td>
               </tr>
             ) : (
               filteredJobs.map((job) => (
                 <tr key={job.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-800/40 transition-colors">
-                  <td className="py-2.5 px-4">
+                  <td className="py-2.5 px-3.5 font-mono text-[11px] text-neutral-700 dark:text-neutral-300">
                     <div className="font-semibold text-neutral-900 dark:text-neutral-100">
                       {job.stageName || job.workflowType}
                     </div>
-                    <div className="text-[11px] text-neutral-400 font-mono">
-                      {job.id}
+                    <div className="text-[10px] text-neutral-400">
+                      {job.id.substring(0, 16)}...
                     </div>
                   </td>
-                  <td className="py-2.5 px-4 text-neutral-600 dark:text-neutral-300">
+                  <td className="py-2.5 px-3.5 text-neutral-700 dark:text-neutral-300">
+                    <span className="px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 text-[11px] font-medium">
+                      {job.processName || 'Direct Execution'}
+                    </span>
+                  </td>
+                  <td className="py-2.5 px-3.5 text-neutral-600 dark:text-neutral-400 text-[11px]">
+                    {job.stageName || 'Pipeline'}
+                  </td>
+                  <td className="py-2.5 px-3.5 text-neutral-800 dark:text-neutral-200 font-medium">
                     {job.propertyName}
                   </td>
-                  <td className="py-2.5 px-4">
-                    <StatusBadge status={job.status} size="sm" />
+                  <td className="py-2.5 px-3.5 text-neutral-500 dark:text-neutral-400 font-mono text-[11px]">
+                    {job.imageId ? job.imageId.substring(0, 10) : '—'}
                   </td>
-                  <td className="py-2.5 px-4 text-neutral-500 dark:text-neutral-400">
+                  <td className="py-2.5 px-3.5 text-neutral-600 dark:text-neutral-300">
                     {job.assignedWorkerName || 'Pending'}
                   </td>
-                  <td className="py-2.5 px-4">
-                    <div className="text-neutral-700 dark:text-neutral-300 text-xs">
-                      {job.currentStepMessage}
-                    </div>
-                    {job.outputPath && (
-                      <div className="text-[10px] text-emerald-500 font-mono truncate max-w-xs mt-0.5">
-                        {job.outputPath}
-                      </div>
-                    )}
+                  <td className="py-2.5 px-3.5">
+                    <StatusBadge status={job.status} size="sm" />
                   </td>
-                  <td className="py-2.5 px-4 text-right">
+                  <td className="py-2.5 px-3.5 text-neutral-400 text-[11px]">
+                    {job.startedAt ? new Date(job.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}
+                  </td>
+                  <td className="py-2.5 px-3.5 text-right">
                     {(job.status === 'failed' || job.status === 'needs_review') && (
                       <button
                         onClick={() => handleRetryJob(job)}
-                        className="px-2.5 py-1 rounded-md bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/20 text-xs font-medium cursor-pointer"
+                        className="btn-sm bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 border border-rose-500/20"
                       >
                         Retry
                       </button>

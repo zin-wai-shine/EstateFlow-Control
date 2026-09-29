@@ -14,8 +14,19 @@ import { openclawClient } from '../services/openclawClient';
 import { db } from '../services/storage';
 
 export const BrowserWorkers: React.FC = () => {
-  const { profiles, workers, refreshProfiles, refreshWorkers, addNotification } = useApp();
+  const { profiles, workers, refreshProfiles, refreshWorkers, processes, addNotification } = useApp();
   const [selectedWorker, setSelectedWorker] = useState<AutomationWorker | null>(workers[0] || null);
+
+  // Find processes that can use a worker
+  const getProcessesForWorker = (worker: AutomationWorker) => {
+    return processes.filter(p => {
+      return p.steps.some(s => {
+        if (s.workerAssignmentMode === 'specific') return s.workerId === worker.id;
+        if (s.workerAssignmentMode === 'worker_group') return s.workerGroupIds?.includes(worker.id);
+        return s.profileId === worker.profileId; // Any available in this profile
+      });
+    });
+  };
 
   const handleOpenBrowser = async (profile: ChromeProfile) => {
     const res = await openclawClient.openNativeChromeProfile(profile);
@@ -123,31 +134,54 @@ export const BrowserWorkers: React.FC = () => {
                 <div
                   key={w.id}
                   onClick={() => setSelectedWorker(w)}
-                  className={`glass-card p-3 rounded-lg cursor-pointer transition-colors flex items-center justify-between ${
+                  className={`glass-card p-3 rounded-xl cursor-pointer transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 border ${
                     isSelected 
                       ? 'border-rose-500/50 bg-rose-500/5 dark:bg-rose-500/10' 
-                      : ''
+                      : 'border-neutral-200 dark:border-neutral-800'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-rose-500">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-rose-500 shrink-0 mt-0.5">
                       <FiCpu className="w-4 h-4" />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span className="font-semibold text-xs text-neutral-900 dark:text-neutral-100">
                           {w.name}
                         </span>
                         <StatusBadge status={w.status} size="sm" />
+                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700">
+                          Role: {w.role ? w.role.replace(/_/g, ' ') : 'Image Enhancement'}
+                        </span>
                       </div>
-                      <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
-                        {w.currentTaskDescription || 'Awaiting job queue'}
+
+                      <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                        {w.status === 'busy' ? (
+                          <span className="text-amber-500 dark:text-amber-400 font-medium">
+                            Process: {w.currentProcessName || 'Active Process'} • Task: {w.currentTaskDescription || 'Generating'}
+                          </span>
+                        ) : (
+                          'Awaiting job queue'
+                        )}
+                      </div>
+
+                      {/* Process Connection Indicator (Requirement 25) */}
+                      <div className="flex flex-wrap items-center gap-1 pt-0.5">
+                        <span className="text-[10px] text-neutral-400">Used by:</span>
+                        {getProcessesForWorker(w).slice(0, 2).map(proc => (
+                          <span key={proc.id} className="text-[10px] px-1.5 py-0.2 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400">
+                            {proc.name}
+                          </span>
+                        ))}
+                        {getProcessesForWorker(w).length > 2 && (
+                          <span className="text-[10px] text-neutral-400">+{getProcessesForWorker(w).length - 2} more</span>
+                        )}
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-xs">
-                    <div className="text-right hidden sm:block">
+                  <div className="flex items-center justify-between sm:justify-end gap-4 text-xs pt-2 sm:pt-0 border-t sm:border-t-0 border-neutral-100 dark:border-neutral-800">
+                    <div className="text-right">
                       <div className="font-medium text-neutral-700 dark:text-neutral-300">
                         {w.totalJobsProcessed} jobs
                       </div>

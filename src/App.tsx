@@ -7,6 +7,9 @@ import { Dashboard } from './pages/Dashboard';
 import { Properties } from './pages/Properties';
 import { PropertyDetail } from './pages/PropertyDetail';
 import { AutomationCenter } from './pages/AutomationCenter';
+import { Processes } from './pages/Processes';
+import { ProcessBuilder } from './pages/ProcessBuilder';
+import { ProcessRunModal } from './pages/ProcessRunModal';
 import { BrowserWorkers } from './pages/BrowserWorkers';
 import { ContentStudio } from './pages/ContentStudio';
 import { Publishing } from './pages/Publishing';
@@ -39,6 +42,10 @@ const AppContent: React.FC = () => {
         return <PropertyDetail />;
       case 'automation':
         return <AutomationCenter />;
+      case 'processes':
+        return <Processes />;
+      case 'process_builder':
+        return <ProcessBuilder />;
       case 'browser_workers':
         return <BrowserWorkers />;
       case 'content_studio':
@@ -65,6 +72,7 @@ const AppContent: React.FC = () => {
         isOpen={isCreatePropertyOpen} 
         onClose={closeCreateProperty} 
       />
+      <ProcessRunModal />
       <OnboardingModal />
     </Layout>
   );

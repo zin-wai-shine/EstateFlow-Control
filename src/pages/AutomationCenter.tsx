@@ -3,7 +3,10 @@ import React, { useState } from 'react';
 import { 
   FiPlay, 
   FiRefreshCw, 
-  FiZap
+  FiZap,
+  FiGitBranch,
+  FiExternalLink,
+  FiLayers
 } from 'react-icons/fi';
 import { useApp } from '../context/AppContext';
 import { StatusBadge } from '../components/common/StatusBadge';
@@ -12,7 +15,7 @@ import { db } from '../services/storage';
 import { AppDropdown } from '../components/common/AppDropdown';
 
 export const AutomationCenter: React.FC = () => {
-  const { properties, jobs, addNotification } = useApp();
+  const { properties, jobs, addNotification, processRuns, openProcessRun, setActivePage } = useApp();
   const [selectedPropertyId, setSelectedPropertyId] = useState(properties[0]?.id || '');
   const [enableEnhance, setEnableEnhance] = useState(true);
   const [enableFbHero, setEnableFbHero] = useState(true);
@@ -166,6 +169,95 @@ export const AutomationCenter: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Active Process Runs Section */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-semibold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+            <FiGitBranch className="text-rose-500" />
+            <span>Process Runs ({processRuns.filter(r => r.status === 'running' || r.status === 'queued' || r.status === 'paused').length} Active)</span>
+          </h2>
+          <button
+            onClick={() => setActivePage('processes')}
+            className="text-xs text-rose-500 hover:text-rose-600 font-medium flex items-center gap-1 cursor-pointer"
+          >
+            <span>Manage Processes</span>
+            <FiExternalLink className="w-3 h-3" />
+          </button>
+        </div>
+
+        {processRuns.filter(r => r.status === 'running' || r.status === 'queued' || r.status === 'paused').length === 0 ? (
+          <div className="glass-panel p-4 rounded-xl flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2 text-neutral-500 dark:text-neutral-400">
+              <FiLayers className="w-4 h-4 text-neutral-400" />
+              <span>No workflows actively running. Saved processes are ready to be triggered.</span>
+            </div>
+            <button
+              onClick={() => setActivePage('processes')}
+              className="text-xs text-rose-500 hover:text-rose-600 font-medium"
+            >
+              Browse Processes →
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {processRuns
+              .filter(r => r.status === 'running' || r.status === 'queued' || r.status === 'paused')
+              .map((run) => {
+                const total = run.jobsCreated || run.totalSteps || 1;
+                const completed = run.jobsCompleted || (run.currentStepOrder > 0 ? run.currentStepOrder - 1 : 0);
+                const percent = Math.min(100, Math.round((completed / total) * 100));
+
+                return (
+                  <div
+                    key={run.id}
+                    onClick={() => openProcessRun(run.id)}
+                    className="glass-card glass-card-hover p-4 rounded-xl cursor-pointer border-l-4 border-l-rose-500 flex flex-col justify-between gap-3"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-xs text-neutral-900 dark:text-neutral-100">
+                            {run.processName}
+                          </span>
+                          <StatusBadge status={run.status} size="sm" />
+                        </div>
+                        <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                          {run.propertyName} • Step {run.currentStepOrder}/{run.totalSteps}
+                        </div>
+                      </div>
+                      <span className="text-[11px] font-mono text-neutral-400">
+                        {run.id}
+                      </span>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="text-neutral-500 dark:text-neutral-400 text-[11px]">
+                          {completed} / {total} Items Processed
+                        </span>
+                        <span className="font-semibold text-neutral-800 dark:text-neutral-200 text-xs">
+                          {percent}%
+                        </span>
+                      </div>
+                      <div className="w-full h-1.5 rounded-full bg-neutral-200 dark:bg-neutral-800 overflow-hidden">
+                        <div
+                          className="h-full bg-rose-600 transition-all duration-300"
+                          style={{ width: `${percent}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1 border-t border-neutral-100 dark:border-neutral-800/60 text-[11px] text-neutral-400">
+                      <span>Click to open live execution monitor</span>
+                      <span className="text-rose-500 font-medium">Open Run →</span>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        )}
       </div>
 
       {/* Live Active Execution Queue */}

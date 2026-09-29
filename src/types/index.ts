@@ -113,7 +113,9 @@ export interface AutomationWorker {
   profileId: string;
   profileFriendlyName: string;
   type: 'enhancement' | 'prompt' | 'hero_facebook' | 'hero_tiktok' | 'publishing';
+  role?: WorkerRole;
   status: WorkerStatus;
+  currentProcessName?: string;
   currentJobId?: string;
   currentPropertyId?: string;
   currentImageId?: string;
@@ -153,6 +155,10 @@ export interface AutomationJob {
   imageId?: string;
   workflowType: JobWorkflowType;
   stageName?: string;
+  processId?: string;
+  processName?: string;
+  processRunId?: string;
+  processStepId?: string;
   assignedWorkerId?: string;
   assignedWorkerName?: string;
   profileId?: string;
@@ -296,3 +302,154 @@ export interface NotificationToastItem {
   timestamp: number;
   autoClose?: boolean;
 }
+
+// ==========================================
+// PROCESS MANAGEMENT SYSTEM DOMAIN SCHEMAS
+// ==========================================
+
+export type WorkerRole = 
+  | 'image_enhancement'
+  | 'prompt_generation'
+  | 'facebook_hero'
+  | 'tiktok_hero'
+  | 'facebook_publishing'
+  | 'marketplace_publishing'
+  | 'generic';
+
+export type ProcessCategory = 
+  | 'image_enhancement'
+  | 'prompt_generation'
+  | 'hero_generation'
+  | 'content_generation'
+  | 'publishing'
+  | 'property_workflow'
+  | 'custom';
+
+export type ProcessStatus = 
+  | 'draft'
+  | 'ready'
+  | 'running'
+  | 'paused'
+  | 'disabled'
+  | 'needs_attention'
+  | 'archived';
+
+export type ProcessInputType = 
+  | 'property'
+  | 'single_image'
+  | 'multiple_images'
+  | 'original_images'
+  | 'enhanced_images'
+  | 'selected_images'
+  | 'property_details'
+  | 'prompt'
+  | 'generated_text'
+  | 'hero_images'
+  | 'custom_files';
+
+export type ProcessOutputType = 
+  | 'enhanced_image'
+  | 'generated_prompt'
+  | 'facebook_hero'
+  | 'tiktok_hero'
+  | 'facebook_caption'
+  | 'tiktok_caption'
+  | 'marketplace_content'
+  | 'published_listing'
+  | 'downloaded_file'
+  | 'custom_output';
+
+export type StepActionType = 
+  | 'image_enhancement'
+  | 'ai_generation'
+  | 'prompt_generation'
+  | 'hero_generation'
+  | 'content_generation'
+  | 'publishing'
+  | 'browser_action'
+  | 'file_operation'
+  | 'wait_for_result'
+  | 'download_result'
+  | 'custom_task';
+
+export type WorkerAssignmentMode = 
+  | 'specific'
+  | 'any_available'
+  | 'worker_group';
+
+export interface ProcessStep {
+  id: string;
+  order: number;
+  name: string;
+  type: StepActionType;
+  input: ProcessInputType;
+  profileId: string; // Connected to existing ChromeProfile.id
+  workerAssignmentMode: WorkerAssignmentMode;
+  workerId?: string; // If specific
+  workerGroupIds?: string[]; // If worker_group
+  promptTemplateId?: string; // Connected to existing PromptTemplate.id
+  expectedResult?: string;
+  downloadRequirement?: boolean;
+  retryPolicy: {
+    maxRetries: number;
+  };
+  timeoutSeconds: number;
+  isEnabled: boolean;
+}
+
+export interface Process {
+  id: string;
+  name: string;
+  description: string;
+  category: ProcessCategory;
+  status: ProcessStatus;
+  icon?: string;
+  colorLabel?: string;
+  inputType: ProcessInputType;
+  outputType: ProcessOutputType;
+  processingMode: 'each_image' | 'batch' | 'single';
+  steps: ProcessStep[];
+  isTemplate?: boolean;
+  isArchived?: boolean;
+  runCount: number;
+  successCount: number;
+  failureCount: number;
+  lastRunAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ProcessRunStatus = 
+  | 'draft'
+  | 'ready'
+  | 'queued'
+  | 'running'
+  | 'paused'
+  | 'completed'
+  | 'completed_with_errors'
+  | 'failed'
+  | 'cancelled'
+  | 'needs_review';
+
+export interface ProcessRun {
+  id: string; // e.g. RUN-000142
+  processId: string;
+  processName: string;
+  propertyId: string;
+  propertyName: string;
+  status: ProcessRunStatus;
+  currentStepOrder: number;
+  totalSteps: number;
+  jobsCreated: number;
+  jobsCompleted: number;
+  jobsFailed: number;
+  sourceImageIds?: string[];
+  activeWorkerIds: string[];
+  queueImageCount: number;
+  completedImageCount: number;
+  totalImageCount: number;
+  startedAt: string;
+  completedAt?: string;
+  errorMessage?: string;
+}
+

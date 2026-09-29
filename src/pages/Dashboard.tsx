@@ -12,7 +12,8 @@ import {
   FiImage, 
   FiChevronRight,
   FiActivity,
-  FiShield
+  FiShield,
+  FiGitBranch
 } from 'react-icons/fi';
 import { useApp } from '../context/AppContext';
 import { StatusBadge } from '../components/common/StatusBadge';
@@ -25,6 +26,8 @@ export const Dashboard: React.FC = () => {
     workers, 
     jobs, 
     health, 
+    processRuns,
+    openProcessRun,
     openCreateProperty, 
     openPropertyDetail, 
     setActivePage 
@@ -49,6 +52,11 @@ export const Dashboard: React.FC = () => {
   const readyWorkers = workers.filter(w => w.status === 'ready').length;
   const busyWorkers = workers.filter(w => w.status === 'busy').length;
   const pendingApprovals = publishingRecords.filter(r => r.status === 'pending_approval').length;
+
+  const runningProcesses = processRuns.filter(r => r.status === 'running').length;
+  const queuedProcesses = processRuns.filter(r => r.status === 'queued').length;
+  const failedProcesses = processRuns.filter(r => r.status === 'failed' || r.status === 'needs_review').length;
+  const recentRuns = processRuns.slice(0, 3);
 
   return (
     <div className="space-y-5">
@@ -324,6 +332,73 @@ export const Dashboard: React.FC = () => {
                   Ready
                 </span>
               </div>
+            </div>
+          </div>
+
+          {/* Processes Overview (Section 51) */}
+          <div className="glass-panel p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-xs font-semibold text-neutral-900 dark:text-neutral-100 flex items-center gap-1.5">
+                <FiGitBranch className="text-rose-500" />
+                <span>Processes Overview</span>
+              </h3>
+              <button
+                onClick={() => setActivePage('processes')}
+                className="text-xs text-rose-500 hover:text-rose-600 font-medium cursor-pointer"
+              >
+                All Processes
+              </button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              <div className="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-800/60 text-center">
+                <div className="text-[10px] text-neutral-500 dark:text-neutral-400">Running</div>
+                <div className="text-sm font-bold text-blue-500 mt-0.5">
+                  {runningProcesses}
+                </div>
+              </div>
+              <div className="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-800/60 text-center">
+                <div className="text-[10px] text-neutral-500 dark:text-neutral-400">Queued</div>
+                <div className="text-sm font-bold text-neutral-700 dark:text-neutral-300 mt-0.5">
+                  {queuedProcesses}
+                </div>
+              </div>
+              <div className="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-800/60 text-center">
+                <div className="text-[10px] text-neutral-500 dark:text-neutral-400">Review</div>
+                <div className={`text-sm font-bold mt-0.5 ${failedProcesses > 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                  {failedProcesses}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="text-[11px] font-medium text-neutral-400 flex items-center justify-between">
+                <span>Recent Runs</span>
+                <span className="text-[10px]">{recentRuns.length} total</span>
+              </div>
+              {recentRuns.length === 0 ? (
+                <div className="text-[11px] text-neutral-400 text-center py-2">
+                  No process runs recorded.
+                </div>
+              ) : (
+                recentRuns.map((run) => (
+                  <div
+                    key={run.id}
+                    onClick={() => openProcessRun(run.id)}
+                    className="p-2 rounded-lg bg-neutral-50 dark:bg-neutral-800/40 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer flex items-center justify-between gap-2"
+                  >
+                    <div className="min-w-0">
+                      <div className="font-medium text-xs text-neutral-800 dark:text-neutral-200 truncate">
+                        {run.processName}
+                      </div>
+                      <div className="text-[10px] text-neutral-400 truncate">
+                        {run.propertyName}
+                      </div>
+                    </div>
+                    <StatusBadge status={run.status} size="sm" />
+                  </div>
+                ))
+              )}
             </div>
           </div>
 

@@ -4,6 +4,7 @@ import {
   FiGrid, 
   FiHome, 
   FiCpu, 
+  FiGitBranch,
   FiLayers, 
   FiEdit3, 
   FiSend, 
@@ -31,7 +32,8 @@ export const Sidebar: React.FC = () => {
     updateSettings, 
     properties, 
     jobs,
-    workers 
+    workers,
+    processRuns
   } = useApp();
 
   const isCollapsed = settings.appearance.sidebarCollapsed;
@@ -48,6 +50,7 @@ export const Sidebar: React.FC = () => {
 
   const activeJobsCount = jobs.filter(j => j.status === 'running' || j.status === 'queued').length;
   const busyWorkersCount = workers.filter(w => w.status === 'busy').length;
+  const activeRunsCount = processRuns.filter(r => r.status === 'running' || r.status === 'queued').length;
 
   const sections: { title?: string; items: NavItem[] }[] = [
     {
@@ -61,7 +64,13 @@ export const Sidebar: React.FC = () => {
       title: 'Automation',
       items: [
         { id: 'automation', label: 'Automation Center', icon: FiCpu },
-        { id: 'browser_workers', label: 'Browser Workers', icon: FiLayers, badge: busyWorkersCount > 0 ? busyWorkersCount : undefined },
+        { id: 'processes', label: 'Processes', icon: FiGitBranch, badge: activeRunsCount > 0 ? activeRunsCount : undefined },
+        { id: 'browser_workers', label: 'Browser Workers', icon: FiLayers, badge: busyWorkersCount > 0 ? busyWorkersCount : undefined }
+      ]
+    },
+    {
+      title: 'Content & Publishing',
+      items: [
         { id: 'content_studio', label: 'Content Studio', icon: FiEdit3 },
         { id: 'publishing', label: 'Publishing', icon: FiSend },
         { id: 'jobs', label: 'Jobs Queue', icon: FiList, badge: activeJobsCount > 0 ? activeJobsCount : undefined }
@@ -93,7 +102,9 @@ export const Sidebar: React.FC = () => {
 
             {section.items.map((item) => {
               const Icon = item.icon;
-              const isActive = activePage === item.id || (item.id === 'properties' && activePage === 'property_detail');
+              const isActive = activePage === item.id || 
+                (item.id === 'properties' && activePage === 'property_detail') ||
+                (item.id === 'processes' && activePage === 'process_builder');
 
               return (
                 <button

@@ -10,10 +10,13 @@ import {
   AutomationJob, 
   AppSettings, 
   NotificationToastItem,
-  SystemHealthStatus
+  SystemHealthStatus,
+  Process,
+  ProcessRun
 } from '../types';
 import { db, INITIAL_USER } from '../services/storage';
 import { automationEngine } from '../services/automationEngine';
+import { processEngine } from '../services/processEngine';
 import { systemHealthService } from '../services/systemHealth';
 
 export type NavigationPage = 
@@ -21,6 +24,8 @@ export type NavigationPage =
   | 'properties'
   | 'property_detail'
   | 'automation'
+  | 'processes'
+  | 'process_builder'
   | 'browser_workers'
   | 'content_studio'
   | 'publishing'
@@ -40,6 +45,9 @@ interface AppContextType {
   setActivePage: (page: NavigationPage) => void;
   selectedPropertyId: string | null;
   openPropertyDetail: (propertyId: string) => void;
+  selectedProcessId: string | null;
+  setSelectedProcessId: (processId: string | null) => void;
+  openProcessBuilder: (processId?: string) => void;
 
   // Theme
   theme: ThemeMode;
@@ -54,10 +62,19 @@ interface AppContextType {
   refreshProfiles: () => void;
   jobs: AutomationJob[];
   refreshJobs: () => void;
+  processes: Process[];
+  refreshProcesses: () => void;
+  processRuns: ProcessRun[];
+  refreshProcessRuns: () => void;
   settings: AppSettings;
   updateSettings: (newSettings: AppSettings) => void;
   health: SystemHealthStatus | null;
   refreshHealth: () => void;
+
+  // Process Run Monitor Modal
+  activeProcessRunId: string | null;
+  openProcessRun: (runId: string) => void;
+  closeProcessRun: () => void;
 
   // Search & Global filter
   globalSearchQuery: string;
@@ -100,6 +117,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [workers, setWorkers] = useState<AutomationWorker[]>([]);
   const [profiles, setProfiles] = useState<ChromeProfile[]>([]);
   const [jobs, setJobs] = useState<AutomationJob[]>([]);
+  const [processes, setProcesses] = useState<Process[]>([]);
+  const [processRuns, setProcessRuns] = useState<ProcessRun[]>([]);
+  const [selectedProcessId, setSelectedProcessId] = useState<string | null>(null);
+  const [activeProcessRunId, setActiveProcessRunId] = useState<string | null>(null);
   const [settings, setSettings] = useState<AppSettings>(db.getSettings());
   const [health, setHealth] = useState<SystemHealthStatus | null>(null);
 
@@ -154,10 +175,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setJobs([...db.getJobs()]);
   }, []);
 
+  const refreshProcesses = useCallback(() => {
+    setProcesses([...db.getProcesses(true)]);
+  }, []);
+
+  const refreshProcessRuns = useCallback(() => {
+    setProcessRuns([...db.getProcessRuns()]);
+  }, []);
+
   const refreshHealth = useCallback(async () => {
     const data = await systemHealthService.getHealth();
     setHealth(data);
   }, []);
+
+  const openProcessBuilder = (processId?: string) => {
+    setSelectedProcessId(processId || null);
+    setActivePage('process_builder');
+  };
+
+  const openProcessRun = (runId: string) => {
+    setActiveProcessRunId(runId);
+  };
+
+  const closeProcessRun = () => {
+    setActiveProcessRunId(null);
+  };
 
   // Initial load
   useEffect(() => {
@@ -165,12 +207,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     refreshWorkers();
     refreshProfiles();
     refreshJobs();
+    refreshProcesses();
+    refreshProcessRuns();
     refreshHealth();
 
     // Subscribe to automation events
     const unsubJob = automationEngine.onJobUpdate(() => {
       refreshJobs();
       refreshProperties();
+      refreshWorkers();
+      refreshProcessRuns();
       refreshHealth();
     });
 
@@ -179,11 +225,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       refreshHealth();
     });
 
+    const unsubRun = processEngine.onRunUpdate(() => {
+      refreshProcessRuns();
+      refreshProcesses();
+      refreshJobs();
+      refreshWorkers();
+      refreshProperties();
+    });
+
     return () => {
       unsubJob();
       unsubWorker();
+      unsubRun();
     };
-  }, [refreshProperties, refreshWorkers, refreshProfiles, refreshJobs, refreshHealth]);
+  }, [refreshProperties, refreshWorkers, refreshProfiles, refreshJobs, refreshProcesses, refreshProcessRuns, refreshHealth]);
 
   const login = async (email: string, pass: string): Promise<boolean> => {
     // In desktop local mode, accept configured local login
@@ -250,6 +305,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setActivePage,
         selectedPropertyId,
         openPropertyDetail,
+        selectedProcessId,
+        setSelectedProcessId,
+        openProcessBuilder,
         theme,
         setTheme,
         properties,
@@ -260,6 +318,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         refreshProfiles,
         jobs,
         refreshJobs,
+        processes,
+        refreshProcesses,
+        processRuns,
+        refreshProcessRuns,
+        activeProcessRunId,
+        openProcessRun,
+        closeProcessRun,
         settings,
         updateSettings,
         health,

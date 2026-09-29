@@ -12,13 +12,18 @@ import {
   FiFolder, 
   FiActivity, 
   FiTrash2,
-  FiLayers
+  FiLayers,
+  FiGitBranch,
+  FiCheckCircle,
+  FiAlertTriangle,
+  FiX
 } from 'react-icons/fi';
 import { useApp } from '../context/AppContext';
 import { StatusBadge } from '../components/common/StatusBadge';
-import { PropertyImage } from '../types';
+import { PropertyImage, Process } from '../types';
 import { db } from '../services/storage';
 import { automationEngine } from '../services/automationEngine';
+import { processEngine } from '../services/processEngine';
 
 export const PropertyDetail: React.FC = () => {
   const { 
@@ -26,10 +31,13 @@ export const PropertyDetail: React.FC = () => {
     setActivePage, 
     addNotification, 
     refreshProperties,
+    processes,
+    openProcessRun,
     jobs 
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'images' | 'automation' | 'content' | 'publishing' | 'activity' | 'files'>('images');
+  const [isProcessModalOpen, setIsProcessModalOpen] = useState(false);
 
   const property = db.getProperty(selectedPropertyId || '');
   const images = db.getImages(selectedPropertyId || '');
@@ -102,6 +110,28 @@ export const PropertyDetail: React.FC = () => {
     addNotification('info', 'Photo Removed', 'Image removed from workspace.');
   };
 
+  const handleRunProcess = async (processId: string) => {
+    try {
+      const run = await processEngine.startProcess(processId, property.id);
+      addNotification('success', 'Process Started', `Running ${run.processName} on ${property.projectName}`);
+      setIsProcessModalOpen(false);
+      openProcessRun(run.id);
+    } catch (e: any) {
+      alert(e.message || 'Could not start process.');
+    }
+  };
+
+  const handleRunDefaultProcess = async () => {
+    const defaultProc = processes.find(p => p.id === 'proc-img-enh') || processes[0];
+    if (!defaultProc) return;
+    const validation = processEngine.validateProcess(defaultProc.id, property.id);
+    if (!validation.isValid) {
+      alert(`Cannot start default process: ${validation.errors.join(' ')}`);
+      return;
+    }
+    handleRunProcess(defaultProc.id);
+  };
+
   const handleRunCompleteWorkflow = () => {
     automationEngine.startCompletePropertyWorkflow(property.id);
     addNotification('success', 'Workflow Triggered', `Complete workflow started for ${property.projectName}.`);
@@ -139,14 +169,23 @@ export const PropertyDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* 1-Click Main Action */}
-        <div className="flex items-center gap-3">
+        {/* Process Actions */}
+        <div className="flex items-center gap-2">
           <button
-            onClick={handleRunCompleteWorkflow}
+            onClick={handleRunDefaultProcess}
+            className="btn-secondary"
+            title="Run configured default image enhancement process"
+          >
+            <FiPlay className="w-3.5 h-3.5 text-rose-500" />
+            <span>Run Default Process</span>
+          </button>
+
+          <button
+            onClick={() => setIsProcessModalOpen(true)}
             className="btn-primary-red"
           >
-            <FiPlay className="w-3.5 h-3.5 fill-white" />
-            <span>Start Complete Workflow</span>
+            <FiGitBranch className="w-3.5 h-3.5" />
+            <span>Run Process</span>
           </button>
         </div>
       </div>
@@ -500,6 +539,103 @@ export const PropertyDetail: React.FC = () => {
                 </span>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* PROCESS SELECTION MODAL */}
+      {isProcessModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-2xl rounded-2xl glass-panel border border-neutral-200 dark:border-neutral-800 shadow-2xl overflow-hidden p-5 space-y-4 max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-neutral-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 flex items-center justify-center">
+                  <FiGitBranch className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-neutral-900 dark:text-neutral-100">
+                    Run Process: {property.projectName}
+                  </h3>
+                  <p className="text-xs text-neutral-400">
+                    Choose an automated workflow to execute on this property.
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsProcessModalOpen(false)}
+                className="p-1 rounded text-neutral-400 hover:text-neutral-700 dark:hover:text-white"
+              >
+                <FiX className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* List of Processes with Readiness State */}
+            <div className="space-y-2.5 overflow-y-auto pr-1 flex-1">
+              {processes.filter(p => !p.isArchived).map(proc => {
+                const validation = processEngine.validateProcess(proc.id, property.id);
+                return (
+                  <div 
+                    key={proc.id} 
+                    className="p-4 rounded-xl glass-card border border-neutral-200 dark:border-neutral-800 space-y-2.5"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-bold text-xs text-neutral-900 dark:text-neutral-100">
+                            {proc.name}
+                          </h4>
+                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-rose-500/10 text-rose-500 font-medium">
+                            {proc.steps.length} Steps
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5 leading-relaxed">
+                          {proc.description}
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={() => handleRunProcess(proc.id)}
+                        disabled={!validation.isValid}
+                        className="btn-primary-red !h-7 !text-[11px] shrink-0 disabled:opacity-40"
+                      >
+                        <FiPlay className="w-3 h-3" />
+                        <span>Start</span>
+                      </button>
+                    </div>
+
+                    {/* Pre-flight readiness check */}
+                    <div className={`p-2 rounded-lg text-[11px] flex items-center justify-between ${
+                      validation.isValid 
+                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' 
+                        : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
+                    }`}>
+                      <div className="flex items-center gap-1.5">
+                        {validation.isValid ? (
+                          <>
+                            <FiCheckCircle className="w-3.5 h-3.5 shrink-0" />
+                            <span>Ready to execute ({images.length} photos in workspace)</span>
+                          </>
+                        ) : (
+                          <>
+                            <FiAlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                            <span>{validation.errors[0] || 'Prerequisites not met'}</span>
+                          </>
+                        )}
+                      </div>
+                      <span className="font-mono text-[10px] uppercase font-semibold">
+                        {validation.isValid ? 'Ready' : 'Not Ready'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="pt-3 border-t border-neutral-200 dark:border-neutral-800 flex justify-end">
+              <button onClick={() => setIsProcessModalOpen(false)} className="btn-secondary">
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
