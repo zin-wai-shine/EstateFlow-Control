@@ -1,0 +1,40 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Tauri and Rust builds
+target/
+src-tauri/target/
+
+# Local database, environment and credentials
+*.db
+*.sqlite
+*.sqlite3
+.env
+.env.*
+!.env.example
+credentials/
+profile_data/
+downloads/
+temp_assets/
