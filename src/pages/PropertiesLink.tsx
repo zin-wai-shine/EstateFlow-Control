@@ -1,4 +1,4 @@
-// EstateFlow Control - Properties Link Management (Calm, Clean, Streamlined)
+// EstateFlow Control - Properties Link Management (Clean Table Layout)
 import React, { useState, useMemo } from 'react';
 import { 
   FiPlus, 
@@ -26,7 +26,6 @@ function parseAndNormalizeUrls(rawText: string): { validUrls: string[]; invalidL
     return { validUrls: [], invalidLines: [] };
   }
 
-  // Regex captures http/https URLs preserving query params, fragments, etc.
   const urlRegex = /(https?:\/\/[^\s,;"'<>]+)/gi;
   const matches = rawText.match(urlRegex) || [];
 
@@ -34,9 +33,7 @@ function parseAndNormalizeUrls(rawText: string): { validUrls: string[]; invalidL
   const seen = new Set<string>();
 
   for (const match of matches) {
-    let clean = match.trim();
-    // Trim trailing punctuation if accidentally captured at sentence ends
-    clean = clean.replace(/[),.;]+$/, '');
+    let clean = match.trim().replace(/[),.;]+$/, '');
     try {
       const parsed = new URL(clean);
       if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
@@ -50,7 +47,6 @@ function parseAndNormalizeUrls(rawText: string): { validUrls: string[]; invalidL
     }
   }
 
-  // Identify lines that don't contain any valid URL
   const rawLines = rawText.split('\n').map(l => l.trim()).filter(Boolean);
   const invalidLines: string[] = [];
   for (const line of rawLines) {
@@ -68,7 +64,7 @@ export const PropertiesLink: React.FC = () => {
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Expanded groups state
+  // Expanded groups state for groups with > 2 links
   const [expandedGroupIds, setExpandedGroupIds] = useState<Set<string>>(new Set());
 
   // Modal State
@@ -257,8 +253,8 @@ export const PropertiesLink: React.FC = () => {
   }, [propertyLinkGroups, searchQuery]);
 
   return (
-    <div className="space-y-4 max-w-6xl mx-auto">
-      {/* Header & Main Actions */}
+    <div className="space-y-4">
+      {/* Top Header & Actions Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-neutral-200 dark:border-neutral-800">
         <div>
           <h1 className="text-lg font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
@@ -271,7 +267,7 @@ export const PropertiesLink: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2.5">
-          {/* Quick Search */}
+          {/* Search Field */}
           <div className="relative w-64 sm:w-72">
             <FiSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 w-3.5 h-3.5 pointer-events-none" />
             <input
@@ -301,202 +297,220 @@ export const PropertiesLink: React.FC = () => {
         </div>
       </div>
 
-      {/* Stored Groups List */}
-      {filteredGroups.length === 0 ? (
-        <div className="p-12 text-center rounded-xl glass-panel border border-neutral-200 dark:border-neutral-800/80">
-          <div className="flex flex-col items-center justify-center gap-2.5 text-neutral-400">
-            <div className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-500">
-              <FiLink className="w-4 h-4" />
-            </div>
-            <p className="text-xs">
-              {searchQuery ? 'No links match your search.' : 'No property links saved yet.'}
-            </p>
-            {!searchQuery && (
-              <button
-                onClick={openCreateModal}
-                className="btn-primary-red mt-1 text-xs py-1 px-3"
-              >
-                <FiPlus className="w-3.5 h-3.5" />
-                <span>Add Property Links</span>
-              </button>
-            )}
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {filteredGroups.map((group) => {
-            const isExpanded = expandedGroupIds.has(group.id) || Boolean(searchQuery);
-            const displayLinks = isExpanded ? group.links : group.links.slice(0, 3);
-            const remainingCount = group.links.length - 3;
-            const groupTitle = `Link Group ${String(group.groupNumber || 1).padStart(3, '0')}`;
-
-            return (
-              <div 
-                key={group.id}
-                className="glass-panel p-3.5 sm:p-4 rounded-xl border border-neutral-200/80 dark:border-neutral-800/80 transition-all hover:border-neutral-300 dark:hover:border-neutral-700/80"
-              >
-                {/* Group Header Row */}
-                <div className="flex items-center justify-between gap-3">
-                  {/* Left: Title + Pill + Date */}
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="font-semibold text-xs text-neutral-900 dark:text-neutral-100 shrink-0">
-                      {groupTitle}
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 shrink-0">
-                      {group.links.length} {group.links.length === 1 ? 'link' : 'links'}
-                    </span>
-                    <span className="text-[11px] text-neutral-400 truncate hidden sm:inline">
-                      {new Date(group.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                    </span>
-                  </div>
-
-                  {/* Right: Consolidated, Quiet Action Toolbar */}
-                  <div className="flex items-center gap-1 shrink-0">
-                    {group.links.length > 1 && (
-                      <button
-                        onClick={() => handleOpenAllLinks(group)}
-                        title="Open all links in browser"
-                        className="px-2 py-1 rounded text-[11px] font-medium text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1"
-                      >
-                        <FiExternalLink className="w-3 h-3 text-rose-500" />
-                        <span>Open all</span>
-                      </button>
-                    )}
-
-                    <button
-                      onClick={() => handleCopyAllLinks(group)}
-                      title="Copy all links (one per line)"
-                      className="px-2 py-1 rounded text-[11px] font-medium text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1"
-                    >
-                      <FiCopy className="w-3 h-3" />
-                      <span>Copy all</span>
-                    </button>
-
-                    <button
-                      onClick={() => openEditModal(group)}
-                      title="Edit links in this group"
-                      className="p-1 rounded text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-                    >
-                      <FiEdit2 className="w-3.5 h-3.5" />
-                    </button>
-
-                    {deletingGroupId === group.id ? (
-                      <div className="flex items-center gap-1 bg-rose-500/10 px-1 py-0.5 rounded border border-rose-500/30">
-                        <button
-                          onClick={() => handleDeleteGroup(group.id)}
-                          className="px-1.5 py-0.5 text-[10px] font-semibold bg-rose-600 text-white rounded hover:bg-rose-700"
-                        >
-                          Delete
-                        </button>
-                        <button
-                          onClick={() => setDeletingGroupId(null)}
-                          className="px-1 text-[10px] text-neutral-400 hover:text-neutral-200"
-                        >
-                          Cancel
-                        </button>
+      {/* Main Table Layout */}
+      <div className="glass-panel rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs min-w-[700px]">
+            <thead className="bg-neutral-100 dark:bg-neutral-800/80 border-b border-neutral-200 dark:border-neutral-800 text-neutral-500 dark:text-neutral-400 font-medium">
+              <tr>
+                <th className="py-2.5 px-4 w-44">Group</th>
+                <th className="py-2.5 px-4">Property Links</th>
+                <th className="py-2.5 px-4 w-32">Date</th>
+                <th className="py-2.5 px-4 w-44 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+              {filteredGroups.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-12 text-center text-neutral-400">
+                    <div className="flex flex-col items-center justify-center gap-2.5">
+                      <div className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-500">
+                        <FiLink className="w-4 h-4" />
                       </div>
-                    ) : (
-                      <button
-                        onClick={() => setDeletingGroupId(group.id)}
-                        title="Delete group"
-                        className="p-1 rounded text-neutral-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
-                      >
-                        <FiTrash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Clean, Streamlined Links List */}
-                <div className="mt-2.5 space-y-1">
-                  {displayLinks.map((url, idx) => {
-                    const isCopied = copiedLinkKey === `${group.id}-${idx}`;
-                    const isMatchSearch = searchQuery && url.toLowerCase().includes(searchQuery.toLowerCase().trim());
-
-                    return (
-                      <div
-                        key={idx}
-                        className={`group/row flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
-                          isMatchSearch
-                            ? 'bg-rose-500/10 text-rose-500 dark:text-rose-400'
-                            : 'hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60'
-                        }`}
-                      >
-                        {/* URL + Number */}
-                        <div className="flex items-center gap-2 min-w-0 flex-1">
-                          <span className="text-[10px] text-neutral-400 w-4 shrink-0 text-right">
-                            {idx + 1}.
-                          </span>
-                          <a
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-mono text-[11px] text-neutral-700 dark:text-neutral-300 hover:text-rose-500 dark:hover:text-rose-400 hover:underline truncate"
-                            title={url}
-                          >
-                            {url}
-                          </a>
-                        </div>
-
-                        {/* Quiet Hover Actions */}
-                        <div className="flex items-center gap-0.5 shrink-0 opacity-80 group-hover/row:opacity-100">
-                          <button
-                            onClick={() => handleOpenSingleLink(url)}
-                            title="Open in browser"
-                            className="p-1 rounded text-neutral-400 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-neutral-200/60 dark:hover:bg-neutral-700/60 transition-colors"
-                          >
-                            <FiExternalLink className="w-3 h-3" />
-                          </button>
-
-                          <button
-                            onClick={() => handleCopySingleLink(url, `${group.id}-${idx}`)}
-                            title="Copy link"
-                            className="p-1 rounded text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-200/60 dark:hover:bg-neutral-700/60 transition-colors"
-                          >
-                            {isCopied ? (
-                              <FiCheck className="w-3 h-3 text-emerald-500" />
-                            ) : (
-                              <FiCopy className="w-3 h-3" />
-                            )}
-                          </button>
-
-                          <button
-                            onClick={() => handleRemoveSingleLink(group, idx)}
-                            title="Remove link"
-                            className="p-1 rounded text-neutral-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
-                          >
-                            <FiX className="w-3 h-3" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Collapsed / Expand Footer */}
-                {!searchQuery && group.links.length > 3 && (
-                  <div className="pt-1.5 flex items-center justify-between text-[11px] text-neutral-400 border-t border-neutral-100 dark:border-neutral-800/60 mt-2">
-                    <span>
-                      {!isExpanded ? `+${remainingCount} more in this group` : `${group.links.length} total links`}
-                    </span>
-                    <button
-                      onClick={() => toggleExpand(group.id)}
-                      className="text-rose-500 hover:text-rose-600 font-medium flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>{isExpanded ? 'Collapse' : `View all (${group.links.length})`}</span>
-                      {isExpanded ? (
-                        <FiChevronUp className="w-3 h-3" />
-                      ) : (
-                        <FiChevronDown className="w-3 h-3" />
+                      <p className="text-xs">
+                        {searchQuery ? 'No links match your search.' : 'No property links saved yet.'}
+                      </p>
+                      {!searchQuery && (
+                        <button
+                          onClick={openCreateModal}
+                          className="btn-primary-red mt-1 text-xs py-1 px-3"
+                        >
+                          <FiPlus className="w-3.5 h-3.5" />
+                          <span>Add Property Links</span>
+                        </button>
                       )}
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredGroups.map((group) => {
+                  const isExpanded = expandedGroupIds.has(group.id) || Boolean(searchQuery);
+                  const displayLinks = isExpanded ? group.links : group.links.slice(0, 2);
+                  const remainingCount = group.links.length - 2;
+                  const groupTitle = `Link Group ${String(group.groupNumber || 1).padStart(3, '0')}`;
+
+                  return (
+                    <tr 
+                      key={group.id} 
+                      className="hover:bg-neutral-50/70 dark:hover:bg-neutral-800/40 transition-colors align-top"
+                    >
+                      {/* Column 1: Group Name & Badge */}
+                      <td className="py-3 px-4">
+                        <div className="flex flex-col gap-1">
+                          <span className="font-semibold text-neutral-900 dark:text-neutral-100 text-xs">
+                            {groupTitle}
+                          </span>
+                          <span className="inline-block w-fit px-2 py-0.5 rounded text-[10px] font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700">
+                            {group.links.length} {group.links.length === 1 ? 'link' : 'links'}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Column 2: Clean Links List */}
+                      <td className="py-3 px-4">
+                        <div className="space-y-1.5">
+                          {displayLinks.map((url, idx) => {
+                            const isCopied = copiedLinkKey === `${group.id}-${idx}`;
+                            const isMatchSearch = searchQuery && url.toLowerCase().includes(searchQuery.toLowerCase().trim());
+
+                            return (
+                              <div
+                                key={idx}
+                                className={`group/item flex items-center justify-between gap-2 p-1.5 rounded-lg transition-colors ${
+                                  isMatchSearch
+                                    ? 'bg-rose-500/10 text-rose-500 dark:text-rose-400'
+                                    : 'hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                  <span className="text-[10px] text-neutral-400 w-4 shrink-0 text-right">
+                                    {idx + 1}.
+                                  </span>
+                                  <a
+                                    href={url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="font-mono text-[11px] text-neutral-700 dark:text-neutral-300 hover:text-rose-500 dark:hover:text-rose-400 hover:underline truncate"
+                                    title={url}
+                                  >
+                                    {url}
+                                  </a>
+                                </div>
+
+                                <div className="flex items-center gap-0.5 shrink-0 opacity-70 group-hover/item:opacity-100">
+                                  <button
+                                    onClick={() => handleOpenSingleLink(url)}
+                                    title="Open link"
+                                    className="p-1 rounded text-neutral-400 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-neutral-200/60 dark:hover:bg-neutral-700/60 transition-colors"
+                                  >
+                                    <FiExternalLink className="w-3 h-3" />
+                                  </button>
+
+                                  <button
+                                    onClick={() => handleCopySingleLink(url, `${group.id}-${idx}`)}
+                                    title="Copy link"
+                                    className="p-1 rounded text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-200/60 dark:hover:bg-neutral-700/60 transition-colors"
+                                  >
+                                    {isCopied ? (
+                                      <FiCheck className="w-3 h-3 text-emerald-500" />
+                                    ) : (
+                                      <FiCopy className="w-3 h-3" />
+                                    )}
+                                  </button>
+
+                                  <button
+                                    onClick={() => handleRemoveSingleLink(group, idx)}
+                                    title="Remove link"
+                                    className="p-1 rounded text-neutral-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
+                                  >
+                                    <FiX className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+
+                          {/* Expand / Collapse Toggle if > 2 links */}
+                          {!searchQuery && group.links.length > 2 && (
+                            <button
+                              onClick={() => toggleExpand(group.id)}
+                              className="text-[11px] text-rose-500 hover:text-rose-600 font-medium flex items-center gap-1 mt-1 pl-1 cursor-pointer"
+                            >
+                              <span>{isExpanded ? 'Collapse' : `+ ${remainingCount} more link${remainingCount > 1 ? 's' : ''}`}</span>
+                              {isExpanded ? (
+                                <FiChevronUp className="w-3 h-3" />
+                              ) : (
+                                <FiChevronDown className="w-3 h-3" />
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Column 3: Added Date */}
+                      <td className="py-3 px-4 text-neutral-500 dark:text-neutral-400 text-xs whitespace-nowrap">
+                        {new Date(group.createdAt).toLocaleDateString('en-GB', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric'
+                        })}
+                      </td>
+
+                      {/* Column 4: Group Actions */}
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          {group.links.length > 1 && (
+                            <button
+                              onClick={() => handleOpenAllLinks(group)}
+                              title="Open all links in browser"
+                              className="px-2 py-1 rounded text-[11px] font-medium text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1"
+                            >
+                              <FiExternalLink className="w-3 h-3 text-rose-500" />
+                              <span>Open all</span>
+                            </button>
+                          )}
+
+                          <button
+                            onClick={() => handleCopyAllLinks(group)}
+                            title="Copy all links"
+                            className="px-2 py-1 rounded text-[11px] font-medium text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1"
+                          >
+                            <FiCopy className="w-3 h-3" />
+                            <span>Copy</span>
+                          </button>
+
+                          <button
+                            onClick={() => openEditModal(group)}
+                            title="Edit group"
+                            className="p-1 rounded text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                          >
+                            <FiEdit2 className="w-3.5 h-3.5" />
+                          </button>
+
+                          {deletingGroupId === group.id ? (
+                            <div className="flex items-center gap-1 bg-rose-500/10 px-1 py-0.5 rounded border border-rose-500/30">
+                              <button
+                                onClick={() => handleDeleteGroup(group.id)}
+                                className="px-1.5 py-0.5 text-[10px] font-semibold bg-rose-600 text-white rounded hover:bg-rose-700"
+                              >
+                                Delete
+                              </button>
+                              <button
+                                onClick={() => setDeletingGroupId(null)}
+                                className="px-1 text-[10px] text-neutral-400 hover:text-neutral-200"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setDeletingGroupId(group.id)}
+                              title="Delete group"
+                              className="p-1 rounded text-neutral-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
+                            >
+                              <FiTrash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
+      </div>
 
       {/* Add / Edit Links Modal */}
       <GlassModal
