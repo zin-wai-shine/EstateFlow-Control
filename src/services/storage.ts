@@ -1007,6 +1007,11 @@ class LocalDatabase {
     this.setItem('workers', list);
   }
 
+  public deleteWorker(id: string): void {
+    const list = this.getWorkers().filter(w => w.id !== id);
+    this.setItem('workers', list);
+  }
+
   // --- JOBS & QUEUE ---
   public getJobs(): AutomationJob[] {
     return this.getItem<AutomationJob[]>('jobs', []);

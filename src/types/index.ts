@@ -93,7 +93,16 @@ export interface PropertyImage {
 
 export type WorkerStatus = 'ready' | 'busy' | 'offline' | 'error' | 'paused';
 
-export type ChromeSessionStatus = 'not_configured' | 'login_required' | 'ready' | 'busy' | 'offline' | 'error';
+export type ChromeSessionStatus = 
+  | 'not_setup' 
+  | 'waiting_for_login' 
+  | 'login_required' 
+  | 'ready' 
+  | 'open' 
+  | 'busy' 
+  | 'offline' 
+  | 'error' 
+  | 'not_configured';
 
 export interface ChromeProfile {
   id: string;

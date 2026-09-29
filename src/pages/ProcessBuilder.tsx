@@ -34,6 +34,7 @@ import {
   WorkerAssignmentMode 
 } from '../types';
 import { AppDropdown } from '../components/common/AppDropdown';
+import { AddBrowserModal } from '../components/browser/AddBrowserModal';
 
 export const ProcessBuilder: React.FC = () => {
   const { 
@@ -41,7 +42,9 @@ export const ProcessBuilder: React.FC = () => {
     setActivePage, 
     refreshProcesses, 
     profiles, 
+    refreshProfiles,
     workers, 
+    refreshWorkers,
     addNotification,
     openProcessRun
   } = useApp();
@@ -102,6 +105,7 @@ export const ProcessBuilder: React.FC = () => {
   const [selectedStepIndex, setSelectedStepIndex] = useState<number>(0);
   const [showAdvanced, setShowAdvanced] = useState<boolean>(false);
   const [testResult, setTestResult] = useState<string | null>(null);
+  const [isAddBrowserOpen, setIsAddBrowserOpen] = useState<boolean>(false);
 
   const selectedStep = steps[selectedStepIndex] || steps[0];
 
@@ -569,93 +573,71 @@ export const ProcessBuilder: React.FC = () => {
               </div>
             </div>
 
-            {/* Connected Chrome Profile (FEEDS FROM EXISTING DB!) */}
+            {/* Simple Browser Selection */}
             <div>
-              <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1 flex items-center justify-between">
-                <span>Assigned Chrome Profile</span>
-                <span className="text-[10px] text-neutral-400">Loads from Browser Workers database</span>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-medium text-neutral-600 dark:text-neutral-300">
+                  Browser
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setIsAddBrowserOpen(true)}
+                  className="text-[11px] text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-medium flex items-center gap-1 cursor-pointer transition-colors"
+                >
+                  <FiPlus className="w-3 h-3" />
+                  <span>Add Browser</span>
+                </button>
+              </div>
+
+              {profiles.length === 0 ? (
+                <div className="p-3 rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700 flex items-center justify-between bg-neutral-50/50 dark:bg-neutral-900/30">
+                  <span className="text-xs text-neutral-500">No browsers configured yet</span>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddBrowserOpen(true)}
+                    className="btn-primary !h-7 !text-xs !px-2.5"
+                  >
+                    <FiPlus className="w-3 h-3" />
+                    <span>Add Browser</span>
+                  </button>
+                </div>
+              ) : (
+                <AppDropdown
+                  options={profiles.map(p => ({
+                    value: p.id,
+                    label: p.friendlyName
+                  }))}
+                  value={selectedStep.profileId || profiles[0]?.id || ''}
+                  onChange={(val) => handleUpdateStep({ profileId: val, workerId: undefined })}
+                  className="w-full"
+                />
+              )}
+            </div>
+
+            {/* Browser Tab / Worker (Automatic by default) */}
+            <div>
+              <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1">
+                Browser Tab / Worker
               </label>
               <AppDropdown
-                options={profiles.map(p => ({
-                  value: p.id,
-                  label: `${p.friendlyName} (${p.assignedWorkerCount} workers)`
-                }))}
-                value={selectedStep.profileId}
-                onChange={(val) => handleUpdateStep({ profileId: val, workerId: undefined })}
+                options={[
+                  { value: 'auto', label: 'Automatic (Default)' },
+                  ...eligibleWorkers.map(w => ({
+                    value: w.id,
+                    label: `${w.name} (${w.status})`
+                  }))
+                ]}
+                value={selectedStep.workerAssignmentMode === 'specific' && selectedStep.workerId ? selectedStep.workerId : 'auto'}
+                onChange={(val) => {
+                  if (val === 'auto') {
+                    handleUpdateStep({ workerAssignmentMode: 'any_available', workerId: undefined });
+                  } else {
+                    handleUpdateStep({ workerAssignmentMode: 'specific', workerId: val });
+                  }
+                }}
                 className="w-full"
               />
             </div>
-
-            {/* Worker Assignment Mode */}
-            <div className="space-y-2">
-              <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-300">
-                Worker Assignment Mode
-              </label>
-              <div className="grid grid-cols-3 gap-2 text-xs">
-                <button
-                  type="button"
-                  onClick={() => handleUpdateStep({ workerAssignmentMode: 'any_available' })}
-                  className={`p-2 rounded-lg border text-left transition-colors ${
-                    selectedStep.workerAssignmentMode === 'any_available'
-                      ? 'border-rose-500 bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold'
-                      : 'border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400'
-                  }`}
-                >
-                  <p className="font-medium text-[11px]">Any Available</p>
-                  <p className="text-[10px] opacity-70 mt-0.5">Recommended</p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleUpdateStep({ workerAssignmentMode: 'specific' })}
-                  className={`p-2 rounded-lg border text-left transition-colors ${
-                    selectedStep.workerAssignmentMode === 'specific'
-                      ? 'border-rose-500 bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold'
-                      : 'border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400'
-                  }`}
-                >
-                  <p className="font-medium text-[11px]">Specific Worker</p>
-                  <p className="text-[10px] opacity-70 mt-0.5">Lock 1 worker</p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleUpdateStep({ workerAssignmentMode: 'worker_group' })}
-                  className={`p-2 rounded-lg border text-left transition-colors ${
-                    selectedStep.workerAssignmentMode === 'worker_group'
-                      ? 'border-rose-500 bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold'
-                      : 'border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400'
-                  }`}
-                >
-                  <p className="font-medium text-[11px]">Worker Group</p>
-                  <p className="text-[10px] opacity-70 mt-0.5">Dedicated pool</p>
-                </button>
-              </div>
-            </div>
-
-            {/* If Specific Worker Mode: Worker Selector filtered by chosen profile */}
-            {selectedStep.workerAssignmentMode === 'specific' && (
-              <div>
-                <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1">
-                  Select Specific Worker from {profiles.find(p => p.id === selectedStep.profileId)?.friendlyName}
-                </label>
-                {eligibleWorkers.length === 0 ? (
-                  <p className="text-xs text-amber-500 p-2 rounded bg-amber-500/10">
-                    No workers assigned to this Chrome profile. Please add or assign workers in Browser Workers.
-                  </p>
-                ) : (
-                  <AppDropdown
-                    options={eligibleWorkers.map(w => ({
-                      value: w.id,
-                      label: `${w.name} (${w.status})`
-                    }))}
-                    value={selectedStep.workerId || eligibleWorkers[0]?.id || ''}
-                    onChange={(val) => handleUpdateStep({ workerId: val })}
-                    className="w-full"
-                  />
-                )}
-              </div>
-            )}
 
             {/* Prompt Template Selector */}
             <div>
@@ -709,7 +691,54 @@ export const ProcessBuilder: React.FC = () => {
               </button>
 
               {showAdvanced && (
-                <div className="mt-3 p-3.5 rounded-xl bg-neutral-100/50 dark:bg-neutral-800/40 space-y-3 text-xs">
+                <div className="mt-3 p-3.5 rounded-xl bg-neutral-100/50 dark:bg-neutral-800/40 space-y-3.5 text-xs">
+                  {/* Worker Assignment Mode */}
+                  <div>
+                    <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">
+                      Worker Assignment Mode
+                    </label>
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateStep({ workerAssignmentMode: 'any_available', workerId: undefined })}
+                        className={`p-2 rounded-lg border text-left transition-colors ${
+                          selectedStep.workerAssignmentMode === 'any_available'
+                            ? 'border-rose-500 bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold'
+                            : 'border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400'
+                        }`}
+                      >
+                        <p className="font-medium text-[11px]">Any Available</p>
+                        <p className="text-[10px] opacity-70 mt-0.5">Automatic (Recommended)</p>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateStep({ workerAssignmentMode: 'specific', workerId: eligibleWorkers[0]?.id })}
+                        className={`p-2 rounded-lg border text-left transition-colors ${
+                          selectedStep.workerAssignmentMode === 'specific'
+                            ? 'border-rose-500 bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold'
+                            : 'border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400'
+                        }`}
+                      >
+                        <p className="font-medium text-[11px]">Specific Worker</p>
+                        <p className="text-[10px] opacity-70 mt-0.5">Lock 1 tab/worker</p>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateStep({ workerAssignmentMode: 'worker_group' })}
+                        className={`p-2 rounded-lg border text-left transition-colors ${
+                          selectedStep.workerAssignmentMode === 'worker_group'
+                            ? 'border-rose-500 bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold'
+                            : 'border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400'
+                        }`}
+                      >
+                        <p className="font-medium text-[11px]">Worker Group</p>
+                        <p className="text-[10px] opacity-70 mt-0.5">Dedicated pool</p>
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400 mb-1">
@@ -764,6 +793,19 @@ export const ProcessBuilder: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Add Browser Modal directly accessible within Process editor */}
+      <AddBrowserModal
+        isOpen={isAddBrowserOpen}
+        onClose={() => setIsAddBrowserOpen(false)}
+        onSuccess={(newProfile) => {
+          refreshProfiles();
+          refreshWorkers();
+          handleUpdateStep({ profileId: newProfile.id });
+          setIsAddBrowserOpen(false);
+          addNotification('success', 'Browser Connected', `"${newProfile.friendlyName}" is now selected for this process step.`);
+        }}
+      />
     </div>
   );
 };

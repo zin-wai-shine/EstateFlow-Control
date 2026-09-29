@@ -52,8 +52,14 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md', c
     case 'waiting':
     case 'pending':
     case 'pending_approval':
+    case 'waiting_for_login':
       icon = <FiClock className="shrink-0 text-amber-400" />;
       colorClasses = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+      break;
+
+    case 'open':
+      icon = <FiCheckCircle className="shrink-0 text-blue-400" />;
+      colorClasses = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
       break;
 
     // Amber / Warning / Retrying
@@ -71,6 +77,13 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md', c
     case 'login_required':
       icon = <FiAlertCircle className="shrink-0 text-rose-500" />;
       colorClasses = 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+      break;
+
+    case 'offline':
+    case 'not_setup':
+    case 'not_configured':
+      icon = <FiAlertCircle className="shrink-0 text-neutral-400" />;
+      colorClasses = 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20';
       break;
 
     // Muted purple
