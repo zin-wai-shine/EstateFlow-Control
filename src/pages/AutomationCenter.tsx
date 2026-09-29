@@ -9,6 +9,7 @@ import { useApp } from '../context/AppContext';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { automationEngine } from '../services/automationEngine';
 import { db } from '../services/storage';
+import { AppDropdown } from '../components/common/AppDropdown';
 
 export const AutomationCenter: React.FC = () => {
   const { properties, jobs, addNotification } = useApp();
@@ -101,17 +102,15 @@ export const AutomationCenter: React.FC = () => {
             <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1.5">
               Target Property
             </label>
-            <select
+            <AppDropdown
+              options={properties.map(p => ({
+                value: p.id,
+                label: `${p.projectName} (${p.bedrooms} Bed, ${p.location})`,
+              }))}
               value={selectedPropertyId}
-              onChange={(e) => setSelectedPropertyId(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-lg glass-input text-xs cursor-pointer dark:bg-neutral-900"
-            >
-              {properties.map(p => (
-                <option key={p.id} value={p.id}>
-                  {p.projectName} ({p.bedrooms} Bed, {p.location})
-                </option>
-              ))}
-            </select>
+              onChange={setSelectedPropertyId}
+              className="w-full"
+            />
             {selectedProperty && (
               <p className="text-[11px] text-neutral-400 mt-1.5">
                 Images available: {db.getImages(selectedProperty.id).length} photos ready for enhancement.

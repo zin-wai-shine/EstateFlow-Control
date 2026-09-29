@@ -14,6 +14,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { EmptyState } from '../components/common/EmptyState';
+import { AppDropdown } from '../components/common/AppDropdown';
 import { db } from '../services/storage';
 
 export const Properties: React.FC = () => {
@@ -97,51 +98,48 @@ export const Properties: React.FC = () => {
       {/* Filter and Control Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-2.5 rounded-xl glass-panel text-xs">
         <div className="flex flex-wrap items-center gap-2">
-          {/* Status Select */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
-            <FiFilter className="text-neutral-400 w-3.5 h-3.5" />
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="bg-transparent text-neutral-800 dark:text-neutral-200 focus:outline-none font-medium cursor-pointer"
-            >
-              <option value="all" className="dark:bg-neutral-900">All Statuses</option>
-              <option value="available" className="dark:bg-neutral-900">Available</option>
-              <option value="reserved" className="dark:bg-neutral-900">Reserved</option>
-              <option value="rented" className="dark:bg-neutral-900">Rented</option>
-              <option value="draft" className="dark:bg-neutral-900">Draft</option>
-              <option value="archived" className="dark:bg-neutral-900">Archived</option>
-            </select>
-          </div>
+          {/* Status Dropdown */}
+          <AppDropdown
+            options={[
+              { value: 'all', label: 'All Statuses' },
+              { value: 'available', label: 'Available' },
+              { value: 'reserved', label: 'Reserved' },
+              { value: 'rented', label: 'Rented' },
+              { value: 'draft', label: 'Draft' },
+              { value: 'archived', label: 'Archived' },
+            ]}
+            value={selectedStatus}
+            onChange={setSelectedStatus}
+            prefix={<FiFilter className="text-neutral-400 w-3.5 h-3.5" />}
+            className="w-36"
+          />
 
-          {/* Type Select */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
-            <select
-              value={selectedListingType}
-              onChange={(e) => setSelectedListingType(e.target.value)}
-              className="bg-transparent text-neutral-800 dark:text-neutral-200 focus:outline-none font-medium cursor-pointer"
-            >
-              <option value="all" className="dark:bg-neutral-900">All Deal Types</option>
-              <option value="rent" className="dark:bg-neutral-900">Rent Only</option>
-              <option value="sale" className="dark:bg-neutral-900">Sale Only</option>
-              <option value="both" className="dark:bg-neutral-900">Rent & Sale</option>
-            </select>
-          </div>
+          {/* Type Dropdown */}
+          <AppDropdown
+            options={[
+              { value: 'all', label: 'All Deal Types' },
+              { value: 'rent', label: 'Rent Only' },
+              { value: 'sale', label: 'Sale Only' },
+              { value: 'both', label: 'Rent & Sale' },
+            ]}
+            value={selectedListingType}
+            onChange={setSelectedListingType}
+            className="w-36"
+          />
 
-          {/* Sort */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
-            <span className="text-neutral-400">Sort:</span>
-            <select
-              value={sortBy}
-              onChange={(e: any) => setSortBy(e.target.value)}
-              className="bg-transparent text-neutral-800 dark:text-neutral-200 focus:outline-none font-medium cursor-pointer"
-            >
-              <option value="newest" className="dark:bg-neutral-900">Newest First</option>
-              <option value="price_high" className="dark:bg-neutral-900">Price: High to Low</option>
-              <option value="price_low" className="dark:bg-neutral-900">Price: Low to High</option>
-              <option value="name" className="dark:bg-neutral-900">Project Name</option>
-            </select>
-          </div>
+          {/* Sort Dropdown */}
+          <AppDropdown
+            options={[
+              { value: 'newest', label: 'Newest First' },
+              { value: 'price_high', label: 'Price: High to Low' },
+              { value: 'price_low', label: 'Price: Low to High' },
+              { value: 'name', label: 'Project Name' },
+            ]}
+            value={sortBy}
+            onChange={(val) => setSortBy(val as any)}
+            prefix={<span className="text-[11px] font-medium text-neutral-400">Sort:</span>}
+            className="w-44"
+          />
         </div>
 
         {/* View Toggle */}

@@ -12,6 +12,7 @@ import { StatusBadge } from '../components/common/StatusBadge';
 import { PublishingChannel, PublishingRecord } from '../types';
 import { publishingService } from '../services/publishingService';
 import { db } from '../services/storage';
+import { AppDropdown } from '../components/common/AppDropdown';
 
 export const Publishing: React.FC = () => {
   const { properties, addNotification } = useApp();
@@ -74,15 +75,12 @@ export const Publishing: React.FC = () => {
           <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
             Target Property:
           </span>
-          <select
+          <AppDropdown
+            options={properties.map(p => ({ value: p.id, label: p.projectName }))}
             value={selectedPropertyId}
-            onChange={(e) => setSelectedPropertyId(e.target.value)}
-            className="px-3 py-1 rounded-lg glass-input text-xs font-medium dark:bg-neutral-900 cursor-pointer"
-          >
-            {properties.map(p => (
-              <option key={p.id} value={p.id}>{p.projectName}</option>
-            ))}
-          </select>
+            onChange={setSelectedPropertyId}
+            className="w-52"
+          />
         </div>
 
         <div className="flex items-center gap-2">

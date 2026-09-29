@@ -31,18 +31,13 @@ export const TopNavbar: React.FC = () => {
     <header className="glass-navbar h-14 px-5 flex items-center justify-between z-30 shrink-0 select-none app-drag-region">
       {/* Left: Branding & Status */}
       <div className="flex items-center gap-5 app-no-drag">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-rose-600 flex items-center justify-center text-white font-bold text-xs">
-            EF
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-sm tracking-tight text-neutral-900 dark:text-white">
-              Estate<span className="text-rose-600 dark:text-rose-500">Flow</span>
-            </span>
-            <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700">
-              Control
-            </span>
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="font-bold text-sm tracking-tight text-neutral-900 dark:text-white">
+            Estate<span className="text-rose-600 dark:text-rose-500">Flow</span>
+          </span>
+          <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700">
+            Control
+          </span>
         </div>
 
         {/* Live System Indicator */}

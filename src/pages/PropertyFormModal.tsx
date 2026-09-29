@@ -5,6 +5,7 @@ import { GlassModal } from '../components/common/GlassModal';
 import { useApp } from '../context/AppContext';
 import { Property, PropertyType, ListingType, PropertyStatus } from '../types';
 import { db } from '../services/storage';
+import { AppDropdown } from '../components/common/AppDropdown';
 
 interface PropertyFormModalProps {
   isOpen: boolean;
@@ -179,33 +180,35 @@ export const PropertyFormModal: React.FC<PropertyFormModalProps> = ({
                 <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1">
                   Property Type
                 </label>
-                <select
+                <AppDropdown
+                  options={[
+                    { value: 'condo', label: 'Condominium' },
+                    { value: 'apartment', label: 'Apartment' },
+                    { value: 'house', label: 'Detached House' },
+                    { value: 'townhome', label: 'Townhome' },
+                    { value: 'villa', label: 'Luxury Villa' },
+                    { value: 'commercial', label: 'Commercial / Office' },
+                  ]}
                   value={propertyType}
-                  onChange={(e: any) => setPropertyType(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-lg glass-input text-xs cursor-pointer dark:bg-neutral-900"
-                >
-                  <option value="condo">Condominium</option>
-                  <option value="apartment">Apartment</option>
-                  <option value="house">Detached House</option>
-                  <option value="townhome">Townhome</option>
-                  <option value="villa">Luxury Villa</option>
-                  <option value="commercial">Commercial / Office</option>
-                </select>
+                  onChange={(val) => setPropertyType(val as PropertyType)}
+                  className="w-full"
+                />
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1">
                   Listing Deal Type
                 </label>
-                <select
+                <AppDropdown
+                  options={[
+                    { value: 'rent', label: 'Rent Only' },
+                    { value: 'sale', label: 'Sale Only' },
+                    { value: 'both', label: 'Both Rent & Sale' },
+                  ]}
                   value={listingType}
-                  onChange={(e: any) => setListingType(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-lg glass-input text-xs cursor-pointer dark:bg-neutral-900"
-                >
-                  <option value="rent">Rent Only</option>
-                  <option value="sale">Sale Only</option>
-                  <option value="both">Both Rent & Sale</option>
-                </select>
+                  onChange={(val) => setListingType(val as ListingType)}
+                  className="w-full"
+                />
               </div>
             </div>
 
@@ -328,15 +331,16 @@ export const PropertyFormModal: React.FC<PropertyFormModalProps> = ({
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1">
                 Furnished Status
               </label>
-              <select
+              <AppDropdown
+                options={[
+                  { value: 'fully_furnished', label: 'Fully Furnished' },
+                  { value: 'partially_furnished', label: 'Partially Furnished' },
+                  { value: 'unfurnished', label: 'Unfurnished' },
+                ]}
                 value={furnishedStatus}
-                onChange={(e: any) => setFurnishedStatus(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-lg glass-input text-xs cursor-pointer dark:bg-neutral-900"
-              >
-                <option value="fully_furnished">Fully Furnished</option>
-                <option value="partially_furnished">Partially Furnished</option>
-                <option value="unfurnished">Unfurnished</option>
-              </select>
+                onChange={(val) => setFurnishedStatus(val as any)}
+                className="w-full"
+              />
             </div>
 
             <div>

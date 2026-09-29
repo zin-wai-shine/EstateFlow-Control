@@ -37,13 +37,10 @@ export const Login: React.FC = () => {
       <div className="w-full max-w-sm rounded-2xl p-7 bg-neutral-950 border border-neutral-800 shadow-xl">
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center mb-6">
-          <div className="w-10 h-10 rounded-xl bg-rose-600 flex items-center justify-center text-white font-bold text-base mb-3">
-            EF
-          </div>
-          <h1 className="text-lg font-bold tracking-tight text-white">
-            EstateFlow Control
+          <h1 className="text-xl font-bold tracking-tight text-white">
+            Estate<span className="text-rose-500">Flow</span> Control
           </h1>
-          <p className="text-xs text-neutral-400 mt-0.5">
+          <p className="text-xs text-neutral-400 mt-1">
             Real-estate automation control center
           </p>
         </div>

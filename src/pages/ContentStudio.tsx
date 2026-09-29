@@ -13,6 +13,7 @@ import { useApp } from '../context/AppContext';
 import { GeneratedContent } from '../types';
 import { db } from '../services/storage';
 import { automationEngine } from '../services/automationEngine';
+import { AppDropdown } from '../components/common/AppDropdown';
 
 export const ContentStudio: React.FC = () => {
   const { properties, addNotification } = useApp();
@@ -93,15 +94,12 @@ export const ContentStudio: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2.5">
-          <select
+          <AppDropdown
+            options={properties.map(p => ({ value: p.id, label: p.projectName }))}
             value={selectedPropertyId}
-            onChange={(e) => setSelectedPropertyId(e.target.value)}
-            className="px-3 py-1.5 rounded-lg glass-input text-xs font-medium dark:bg-neutral-900 cursor-pointer"
-          >
-            {properties.map(p => (
-              <option key={p.id} value={p.id}>{p.projectName}</option>
-            ))}
-          </select>
+            onChange={setSelectedPropertyId}
+            className="w-52"
+          />
 
           <button
             onClick={handleRegenerate}

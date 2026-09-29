@@ -52,11 +52,8 @@ export const OnboardingModal: React.FC = () => {
         {/* Step 1: Welcome */}
         {currentStep === 1 && (
           <div className="space-y-3 text-center py-4">
-            <div className="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center font-bold text-base mx-auto">
-              EF
-            </div>
             <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
-              Welcome to EstateFlow Control
+              Welcome to Estate<span className="text-rose-600 dark:text-rose-500">Flow</span> Control
             </h3>
             <p className="text-xs text-neutral-400 max-w-sm mx-auto leading-relaxed">
               Your desktop automation control center for luxury real-estate portfolios, automated image enhancement, and multi-channel publishing.

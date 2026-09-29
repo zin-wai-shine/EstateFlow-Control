@@ -368,18 +368,13 @@ export const Settings: React.FC = () => {
       {/* Tab: About */}
       {activeTab === 'about' && (
         <div className="glass-panel p-5 space-y-3">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-rose-600 flex items-center justify-center text-white font-bold text-xs">
-              EF
-            </div>
-            <div>
-              <h3 className="font-semibold text-sm text-neutral-900 dark:text-neutral-100">
-                EstateFlow Control
-              </h3>
-              <span className="text-xs text-neutral-400">
-                Version 1.0.0
-              </span>
-            </div>
+          <div>
+            <h3 className="font-semibold text-sm text-neutral-900 dark:text-neutral-100">
+              Estate<span className="text-rose-600 dark:text-rose-500">Flow</span> Control
+            </h3>
+            <span className="text-xs text-neutral-400">
+              Version 1.0.0
+            </span>
           </div>
           <p className="text-xs text-neutral-400 leading-relaxed max-w-md">
             Sandboxed macOS desktop application using Tauri 2, React, TypeScript, and OpenClaw automation bridge.
