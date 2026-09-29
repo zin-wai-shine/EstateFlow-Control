@@ -114,6 +114,8 @@ export interface ChromeProfile {
   lastActiveAt?: string;
   accountEmail?: string;
   notes?: string;
+  loginUrl?: string;
+  loginService?: string;
 }
 
 export interface AutomationWorker {

@@ -13,7 +13,8 @@ import {
   FiChevronUp,
   FiTag,
   FiSliders,
-  FiCheck
+  FiCheck,
+  FiGlobe
 } from 'react-icons/fi';
 import { useApp } from '../context/AppContext';
 import { StatusBadge } from '../components/common/StatusBadge';
@@ -39,6 +40,7 @@ export const BrowserWorkers: React.FC = () => {
   const [isAddBrowserOpen, setIsAddBrowserOpen] = useState(false);
   const [renamingProfile, setRenamingProfile] = useState<ChromeProfile | null>(null);
   const [newFriendlyName, setNewFriendlyName] = useState('');
+  const [newLoginUrl, setNewLoginUrl] = useState('');
   
   const [purposeProfile, setPurposeProfile] = useState<ChromeProfile | null>(null);
   const [selectedPurpose, setSelectedPurpose] = useState<string>('general');
@@ -97,6 +99,7 @@ export const BrowserWorkers: React.FC = () => {
   const openRenameModal = (profile: ChromeProfile) => {
     setRenamingProfile(profile);
     setNewFriendlyName(profile.friendlyName);
+    setNewLoginUrl(profile.loginUrl || 'https://chatgpt.com');
   };
 
   const handleSaveRename = (e: React.FormEvent) => {
@@ -106,6 +109,7 @@ export const BrowserWorkers: React.FC = () => {
     const updated = {
       ...renamingProfile,
       friendlyName: newFriendlyName.trim(),
+      loginUrl: newLoginUrl.trim() || renamingProfile.loginUrl || 'https://chatgpt.com',
       lastActiveAt: new Date().toISOString()
     };
     db.saveProfile(updated);
@@ -259,6 +263,19 @@ export const BrowserWorkers: React.FC = () => {
 
                       <StatusBadge status={prof.chatGptSessionStatus || 'ready'} size="sm" />
                     </div>
+
+                    {/* Login Website Indicator */}
+                    {prof.loginUrl && (
+                      <div className="flex items-center gap-1.5 text-[11px] text-neutral-500 dark:text-neutral-400 mt-2">
+                        <FiGlobe className="w-3 h-3 text-neutral-400 shrink-0" />
+                        <span className="font-medium text-neutral-700 dark:text-neutral-300 shrink-0">
+                          {prof.loginService || 'Target'}:
+                        </span>
+                        <span className="truncate text-neutral-500 dark:text-neutral-400 font-mono text-[10.5px]" title={prof.loginUrl}>
+                          {prof.loginUrl}
+                        </span>
+                      </div>
+                    )}
 
                     {/* Process assignment indicator */}
                     {usedProcesses.length > 0 && (
@@ -484,6 +501,18 @@ export const BrowserWorkers: React.FC = () => {
                 autoFocus
               />
             </div>
+            <div>
+              <label className="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+                Login Website URL
+              </label>
+              <input
+                type="url"
+                value={newLoginUrl}
+                onChange={(e) => setNewLoginUrl(e.target.value)}
+                placeholder="https://chatgpt.com"
+                className="glass-input w-full px-3 py-1.5 text-xs rounded-lg font-mono"
+              />
+            </div>
             <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-200 dark:border-neutral-800">
               <button
                 type="button"
@@ -575,6 +604,10 @@ export const BrowserWorkers: React.FC = () => {
               <div className="flex justify-between">
                 <span className="text-neutral-400">Session Status:</span>
                 <span className="font-mono text-neutral-800 dark:text-neutral-200">{advancedProfile.chatGptSessionStatus}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-neutral-400">Login Website:</span>
+                <span className="font-mono text-neutral-800 dark:text-neutral-200 truncate max-w-xs">{advancedProfile.loginUrl || 'Default'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-neutral-400">Last Active:</span>

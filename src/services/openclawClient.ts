@@ -53,20 +53,37 @@ class OpenClawClient {
     }
   }
 
-  public async openNativeChromeProfile(profile: ChromeProfile): Promise<{ success: boolean; message: string }> {
+  public async openNativeChromeProfile(profile: ChromeProfile, customUrl?: string): Promise<{ success: boolean; message: string }> {
+    const targetUrl = customUrl || profile.loginUrl || 'https://chatgpt.com';
+
+    let launchedViaTauri = false;
+    try {
+      const { invoke } = await import('@tauri-apps/api/core');
+      await invoke<string>('open_native_chrome', {
+        profileDir: profile.profileDirName,
+        url: targetUrl
+      });
+      launchedViaTauri = true;
+    } catch (e) {
+      // In web browser dev mode without Tauri shell, open in new tab
+      if (typeof window !== 'undefined') {
+        window.open(targetUrl, '_blank');
+      }
+    }
+
     db.addTechnicalLog({
       serviceName: 'OpenClawClient',
       level: 'info',
       profileId: profile.id,
       action: 'LAUNCH_CHROME_PROFILE',
       result: 'SUCCESS',
-      details: `Dispatched native macOS Chrome launch command for profile "${profile.profileDirName}"`
+      details: `Dispatched native macOS Chrome launch for profile "${profile.profileDirName}" to "${targetUrl}" (Tauri: ${launchedViaTauri})`
     });
 
     db.addActivity({
       eventType: 'worker',
       title: `Chrome Profile Opened: ${profile.friendlyName}`,
-      description: `Launched native macOS Chrome session with persistent user profile directory.`,
+      description: `Launched native macOS Chrome session for ${targetUrl} using dedicated profile container.`,
       severity: 'info'
     });
 
@@ -75,7 +92,7 @@ class OpenClawClient {
 
     return {
       success: true,
-      message: `Launched Google Chrome with Profile: ${profile.friendlyName}`
+      message: `Launched Google Chrome for ${profile.friendlyName}`
     };
   }
 

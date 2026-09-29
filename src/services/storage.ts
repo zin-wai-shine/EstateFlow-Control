@@ -124,7 +124,9 @@ export const DEFAULT_PROFILES: ChromeProfile[] = [
     assignedWorkerCount: 2,
     lastActiveAt: new Date().toISOString(),
     accountEmail: 'agent.team@estateflow.pro',
-    notes: 'Dedicated for high-volume interior & exterior photo enhancements'
+    notes: 'Dedicated for high-volume interior & exterior photo enhancements',
+    loginService: 'ChatGPT',
+    loginUrl: 'https://chatgpt.com'
   },
   {
     id: 'prof-b',
@@ -135,7 +137,9 @@ export const DEFAULT_PROFILES: ChromeProfile[] = [
     assignedWorkerCount: 2,
     lastActiveAt: new Date(Date.now() - 3600000).toISOString(),
     accountEmail: 'studio.ops@estateflow.pro',
-    notes: 'Secondary parallel worker queue'
+    notes: 'Secondary parallel worker queue',
+    loginService: 'ChatGPT',
+    loginUrl: 'https://chatgpt.com'
   },
   {
     id: 'prof-c',
@@ -146,7 +150,9 @@ export const DEFAULT_PROFILES: ChromeProfile[] = [
     assignedWorkerCount: 1,
     lastActiveAt: new Date(Date.now() - 7200000).toISOString(),
     accountEmail: 'creative@estateflow.pro',
-    notes: 'Optimized for Facebook 1:1 and TikTok 9:16 hero asset synthesis'
+    notes: 'Optimized for Facebook 1:1 and TikTok 9:16 hero asset synthesis',
+    loginService: 'ChatGPT',
+    loginUrl: 'https://chatgpt.com'
   },
   {
     id: 'prof-d',
@@ -157,7 +163,9 @@ export const DEFAULT_PROFILES: ChromeProfile[] = [
     assignedWorkerCount: 1,
     lastActiveAt: new Date(Date.now() - 1800000).toISOString(),
     accountEmail: 'social@estateflow.pro',
-    notes: 'Authenticated for Facebook Marketplace and business page automation'
+    notes: 'Authenticated for Facebook Marketplace and business page automation',
+    loginService: 'Facebook',
+    loginUrl: 'https://www.facebook.com'
   }
 ];
 

@@ -4,7 +4,8 @@ import {
   FiExternalLink, 
   FiCheckCircle, 
   FiCheck,
-  FiRefreshCw
+  FiRefreshCw,
+  FiGlobe
 } from 'react-icons/fi';
 import { GlassModal } from '../common/GlassModal';
 import { StatusBadge } from '../common/StatusBadge';
@@ -19,6 +20,14 @@ interface AddBrowserModalProps {
   onSuccess?: (createdProfile: ChromeProfile) => void;
 }
 
+const LOGIN_SERVICES = [
+  { id: 'chatgpt', name: 'ChatGPT', url: 'https://chatgpt.com', purpose: 'enhancement' as const },
+  { id: 'facebook', name: 'Facebook', url: 'https://www.facebook.com', purpose: 'publishing' as const },
+  { id: 'tiktok', name: 'TikTok', url: 'https://www.tiktok.com', purpose: 'hero' as const },
+  { id: 'google', name: 'Google Account', url: 'https://accounts.google.com', purpose: 'general' as const },
+  { id: 'custom', name: 'Custom URL', url: '', purpose: 'general' as const }
+];
+
 export const AddBrowserModal: React.FC<AddBrowserModalProps> = ({
   isOpen,
   onClose,
@@ -27,6 +36,8 @@ export const AddBrowserModal: React.FC<AddBrowserModalProps> = ({
   const { refreshProfiles, refreshWorkers, addNotification } = useApp();
   
   const [browserName, setBrowserName] = useState('');
+  const [selectedService, setSelectedService] = useState<string>('chatgpt');
+  const [targetUrl, setTargetUrl] = useState<string>('https://chatgpt.com');
   const [step, setStep] = useState<'input' | 'waiting_login'>('input');
   const [createdProfile, setCreatedProfile] = useState<ChromeProfile | null>(null);
   const [isLaunching, setIsLaunching] = useState(false);
@@ -35,6 +46,8 @@ export const AddBrowserModal: React.FC<AddBrowserModalProps> = ({
 
   const resetState = () => {
     setBrowserName('');
+    setSelectedService('chatgpt');
+    setTargetUrl('https://chatgpt.com');
     setStep('input');
     setCreatedProfile(null);
     setIsLaunching(false);
@@ -62,16 +75,23 @@ export const AddBrowserModal: React.FC<AddBrowserModalProps> = ({
     const profileId = `profile-b${now}`;
     const safeDirName = `EstateFlow_Browser_${now}`;
 
-    // 1. Create Profile automatically
+    const chosenServiceObj = LOGIN_SERVICES.find(s => s.id === selectedService);
+    const finalUrl = targetUrl.trim() || 'https://chatgpt.com';
+    const finalServiceName = chosenServiceObj?.id === 'custom' ? 'Custom' : (chosenServiceObj?.name || 'ChatGPT');
+    const computedPurpose = chosenServiceObj?.purpose || 'general';
+
+    // 1. Create Profile automatically with saved login service & URL
     const newProfile: ChromeProfile = {
       id: profileId,
       friendlyName: trimmed,
       profileDirName: safeDirName,
-      purpose: 'general',
+      purpose: computedPurpose,
       chatGptSessionStatus: 'waiting_for_login',
       assignedWorkerCount: 1,
       notes: `Dedicated Chrome profile for ${trimmed}. Persistent login container.`,
-      lastActiveAt: new Date().toISOString()
+      lastActiveAt: new Date().toISOString(),
+      loginService: finalServiceName,
+      loginUrl: finalUrl
     };
 
     // 2. Create standard worker automatically so Process Engine can utilize it seamlessly
@@ -98,10 +118,10 @@ export const AddBrowserModal: React.FC<AddBrowserModalProps> = ({
 
     setCreatedProfile(newProfile);
 
-    // 3. Launch native macOS Chrome with dedicated profile directory
+    // 3. Launch native macOS Chrome with dedicated profile directory navigated to targetUrl
     try {
       await openclawClient.openNativeChromeProfile(newProfile);
-      addNotification('info', 'Chrome Launched', `Opened dedicated Chrome session for "${trimmed}". Sign in to your accounts.`);
+      addNotification('info', 'Chrome Launched', `Opened dedicated Chrome session for "${trimmed}" at ${finalUrl}. Sign in to your account.`);
     } catch (e: any) {
       addNotification('warning', 'Chrome Launch Warning', e?.message || 'Profile created. Click Open Browser to retry launch.');
     } finally {
@@ -188,6 +208,56 @@ export const AddBrowserModal: React.FC<AddBrowserModalProps> = ({
             )}
           </div>
 
+          {/* Login Browser / Service Selector */}
+          <div>
+            <label className="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">
+              Login Browser / Website
+            </label>
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5 mb-2">
+              {LOGIN_SERVICES.map((srv) => (
+                <button
+                  key={srv.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedService(srv.id);
+                    if (srv.id !== 'custom') {
+                      setTargetUrl(srv.url);
+                    }
+                  }}
+                  className={`px-2 py-1.5 rounded-lg text-xs font-medium border text-center transition-all cursor-pointer ${
+                    selectedService === srv.id
+                      ? 'border-rose-500 bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold'
+                      : 'border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-700'
+                  }`}
+                >
+                  {srv.name}
+                </button>
+              ))}
+            </div>
+
+            {/* Target URL input */}
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-neutral-400">
+                <FiGlobe className="w-3.5 h-3.5" />
+              </div>
+              <input
+                type="url"
+                value={targetUrl}
+                onChange={(e) => {
+                  setTargetUrl(e.target.value);
+                  if (selectedService !== 'custom') {
+                    setSelectedService('custom');
+                  }
+                }}
+                placeholder="https://chatgpt.com"
+                className="glass-input w-full pl-8 pr-3 py-1.5 text-xs rounded-lg font-mono text-neutral-800 dark:text-neutral-200"
+              />
+            </div>
+            <p className="text-[11px] text-neutral-400 mt-1">
+              External Chrome will navigate to this address automatically for manual sign in.
+            </p>
+          </div>
+
           <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-neutral-200 dark:border-neutral-800">
             <button
               type="button"
@@ -224,11 +294,29 @@ export const AddBrowserModal: React.FC<AddBrowserModalProps> = ({
               <StatusBadge status={createdProfile?.chatGptSessionStatus || 'waiting_for_login'} size="sm" />
             </div>
 
-            <div className="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed bg-neutral-50/80 dark:bg-neutral-800/40 p-2.5 rounded-lg border border-neutral-100 dark:border-neutral-800">
+            {/* Target Login Website Row */}
+            {createdProfile?.loginUrl && (
+              <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-neutral-100/70 dark:bg-neutral-800/60 border border-neutral-200/50 dark:border-neutral-700/50 text-xs">
+                <div className="flex items-center gap-2 min-w-0">
+                  <FiGlobe className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                  <span className="font-semibold text-neutral-800 dark:text-neutral-200 shrink-0">
+                    {createdProfile.loginService || 'Target'}:
+                  </span>
+                  <span className="text-neutral-500 dark:text-neutral-400 font-mono text-[11px] truncate">
+                    {createdProfile.loginUrl}
+                  </span>
+                </div>
+                <span className="text-[10px] text-rose-600 dark:text-rose-400 font-medium shrink-0 ml-2">
+                  Opened for Sign In
+                </span>
+              </div>
+            )}
+
+            <div className="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed bg-neutral-50/80 dark:bg-neutral-800/40 p-2.5 rounded-lg border border-neutral-100 dark:border-neutral-800 space-y-1">
               <p>
-                1. Sign into your required websites (ChatGPT, Facebook, etc.) inside the opened external Chrome window.
+                1. Sign into <strong className="text-neutral-800 dark:text-neutral-200">{createdProfile?.loginService || 'your account'}</strong> inside the opened external Chrome window.
               </p>
-              <p className="mt-1 text-neutral-400">
+              <p className="mt-1 text-neutral-400 text-[11px]">
                 2. Your login session will be permanently preserved in this browser container.
               </p>
             </div>
