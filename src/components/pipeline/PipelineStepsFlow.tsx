@@ -12,6 +12,7 @@ import {
   SmartStepTemplate, 
   instantiateNode 
 } from '../../services/nodeRegistry';
+import { pipelineEngine } from '../../services/pipelineEngine';
 import { 
   FiPlus, 
   FiArrowDown, 
@@ -34,7 +35,8 @@ import {
   FiGlobe,
   FiChevronUp,
   FiChevronDown,
-  FiEye
+  FiEye,
+  FiExternalLink
 } from 'react-icons/fi';
 
 interface PipelineStepsFlowProps {
@@ -81,12 +83,13 @@ export const PipelineStepsFlow: React.FC<PipelineStepsFlowProps> = ({
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Helper to get step run state
-  const getStepRunState = (nodeId: string): { state: NodeRuntimeState; progress?: string; error?: string } => {
+  const getStepRunState = (nodeId: string): { state: NodeRuntimeState; progress?: string; currentAction?: string; error?: string } => {
     const nr = activeRun?.nodeRuns?.[nodeId] || activeRun?.nodeStates?.[nodeId];
     if (!activeRun || !nr) return { state: 'idle' };
     return {
       state: nr.state || nr.status || 'idle',
       progress: nr.progress ? `${nr.progress.current} / ${nr.progress.total}` : undefined,
+      currentAction: nr.currentAction,
       error: nr.errorMessage || nr.error
     };
   };
@@ -245,11 +248,34 @@ export const PipelineStepsFlow: React.FC<PipelineStepsFlowProps> = ({
                         )}
                         {node.config.targetToolName || tmpl?.subtitle || 'Configured automation task.'}
                       </p>
+
+                      {/* Live Runtime Action Banner (Section 19: Real Job Tracking) */}
+                      {runInfo.currentAction && runInfo.state === 'running' && (
+                        <div className="mt-2 text-xs text-blue-600 dark:text-blue-400 font-semibold flex items-center gap-1.5 bg-blue-500/10 px-3 py-1.5 rounded-xl border border-blue-500/20">
+                          <FiRefreshCw className="w-3.5 h-3.5 animate-spin shrink-0 text-blue-500" />
+                          <span>Action: {runInfo.currentAction}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
                   {/* Actions & Status */}
                   <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+                    {/* Open Active Tab Button (Section 46) */}
+                    {activeRun && runInfo.state === 'running' && (
+                      <button
+                        onClick={() => {
+                          const tabId = node.config.savedTabId || 'tab-enh-1';
+                          pipelineEngine.openActiveTab(tabId);
+                        }}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition-all mr-1"
+                        title="Focus active Chrome tab"
+                      >
+                        <FiExternalLink className="w-3.5 h-3.5" />
+                        <span>Open Active Tab</span>
+                      </button>
+                    )}
+
                     {/* Live Run Status Pill */}
                     {activeRun && runInfo.state !== 'idle' && (
                       <span className={`px-2.5 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 ${

@@ -135,6 +135,7 @@ export const Pipelines: React.FC = () => {
       name: newPoolName.trim(),
       description: newPoolDesc.trim(),
       memberProfileIds: [],
+      members: [],
       concurrencyLimit: newPoolConcurrency,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()

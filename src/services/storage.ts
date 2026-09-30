@@ -17,6 +17,12 @@ import {
   ProcessRun,
   PropertyLinkGroup
 } from '../types';
+import {
+  SavedTab,
+  TabRuntimeStatus,
+  WorkerPool,
+  WorkerPoolMember
+} from '../types/pipeline';
 
 const DB_KEY_PREFIX = 'estateflow_db_';
 const DB_VERSION = 2;
@@ -229,6 +235,134 @@ export const DEFAULT_WORKERS: AutomationWorker[] = [
     totalJobsProcessed: 52,
     successRate: 100.0,
     startedAt: new Date().toISOString()
+  }
+];
+
+export const DEFAULT_SAVED_TABS: SavedTab[] = [
+  // ChatGPT Main (prof-a)
+  {
+    id: 'tab-enh-1',
+    browserId: 'prof-a',
+    friendlyName: 'Enhance 01',
+    expectedUrl: 'https://chatgpt.com',
+    role: 'enhancement',
+    status: 'idle',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'tab-enh-2',
+    browserId: 'prof-a',
+    friendlyName: 'Enhance 02',
+    expectedUrl: 'https://chatgpt.com',
+    role: 'enhancement',
+    status: 'idle',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'tab-fb-prompt',
+    browserId: 'prof-a',
+    friendlyName: 'Facebook Prompt',
+    expectedUrl: 'https://chatgpt.com',
+    role: 'prompt',
+    status: 'idle',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'tab-tt-prompt',
+    browserId: 'prof-a',
+    friendlyName: 'TikTok Prompt',
+    expectedUrl: 'https://chatgpt.com',
+    role: 'prompt',
+    status: 'idle',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  // ChatGPT Secondary (prof-b)
+  {
+    id: 'tab-enh-3',
+    browserId: 'prof-b',
+    friendlyName: 'Enhance 03',
+    expectedUrl: 'https://chatgpt.com',
+    role: 'enhancement',
+    status: 'idle',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'tab-enh-4',
+    browserId: 'prof-b',
+    friendlyName: 'Enhance 04',
+    expectedUrl: 'https://chatgpt.com',
+    role: 'enhancement',
+    status: 'idle',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'tab-fb-hero',
+    browserId: 'prof-b',
+    friendlyName: 'Facebook Hero',
+    expectedUrl: 'https://chatgpt.com',
+    role: 'hero',
+    status: 'idle',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  // Creative / Hero (prof-c)
+  {
+    id: 'tab-post-studio',
+    browserId: 'prof-c',
+    friendlyName: 'Post Studio',
+    expectedUrl: 'http://localhost:5173/crop',
+    role: 'tools',
+    status: 'idle',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  // Facebook Publishing (prof-d)
+  {
+    id: 'tab-facebook',
+    browserId: 'prof-d',
+    friendlyName: 'Facebook',
+    expectedUrl: 'https://www.facebook.com',
+    role: 'publishing',
+    status: 'idle',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }
+];
+
+export const DEFAULT_WORKER_POOLS: WorkerPool[] = [
+  {
+    id: 'pool-enhancement',
+    name: 'Enhancement Pool',
+    description: 'High-speed 4-worker photo enhancement across ChatGPT Main & Secondary',
+    concurrencyLimit: 4,
+    members: [
+      { browserId: 'prof-a', savedTabId: 'tab-enh-1', enabled: true, priority: 1, status: 'idle' },
+      { browserId: 'prof-a', savedTabId: 'tab-enh-2', enabled: true, priority: 1, status: 'idle' },
+      { browserId: 'prof-b', savedTabId: 'tab-enh-3', enabled: true, priority: 1, status: 'idle' },
+      { browserId: 'prof-b', savedTabId: 'tab-enh-4', enabled: true, priority: 1, status: 'idle' },
+    ],
+    memberProfileIds: ['prof-a', 'prof-b'],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'pool-social-prompts',
+    name: 'Social Content Pool',
+    description: 'Concurrent copywriting & caption synthesis workers',
+    concurrencyLimit: 2,
+    members: [
+      { browserId: 'prof-a', savedTabId: 'tab-fb-prompt', enabled: true, priority: 1, status: 'idle' },
+      { browserId: 'prof-a', savedTabId: 'tab-tt-prompt', enabled: true, priority: 1, status: 'idle' },
+    ],
+    memberProfileIds: ['prof-a'],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 ];
 
@@ -1018,6 +1152,80 @@ class LocalDatabase {
   public deleteWorker(id: string): void {
     const list = this.getWorkers().filter(w => w.id !== id);
     this.setItem('workers', list);
+  }
+
+  // --- SAVED TABS ---
+  public getSavedTabs(browserId?: string): SavedTab[] {
+    const tabs = this.getItem<SavedTab[]>('saved_tabs', DEFAULT_SAVED_TABS);
+    if (browserId) {
+      return tabs.filter(t => t.browserId === browserId);
+    }
+    return tabs;
+  }
+
+  public getSavedTab(id: string): SavedTab | undefined {
+    return this.getSavedTabs().find(t => t.id === id);
+  }
+
+  public saveSavedTab(tab: SavedTab): void {
+    const tabs = this.getSavedTabs();
+    const index = tabs.findIndex(t => t.id === tab.id);
+    if (index >= 0) {
+      tabs[index] = { ...tab, updatedAt: new Date().toISOString() };
+    } else {
+      tabs.push({ ...tab, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+    }
+    this.setItem('saved_tabs', tabs);
+  }
+
+  public deleteSavedTab(id: string): void {
+    const tabs = this.getSavedTabs().filter(t => t.id !== id);
+    this.setItem('saved_tabs', tabs);
+  }
+
+  public updateSavedTabStatus(
+    id: string, 
+    status: TabRuntimeStatus, 
+    currentJobId?: string, 
+    currentAction?: string, 
+    activeImageName?: string
+  ): void {
+    const tab = this.getSavedTab(id);
+    if (!tab) return;
+    tab.status = status;
+    tab.currentJobId = currentJobId;
+    tab.currentAction = currentAction;
+    if (activeImageName !== undefined) {
+      tab.activeImageName = activeImageName;
+    }
+    tab.lastSeen = new Date().toISOString();
+    tab.updatedAt = new Date().toISOString();
+    this.saveSavedTab(tab);
+  }
+
+  // --- WORKER POOLS ---
+  public getWorkerPools(): WorkerPool[] {
+    return this.getItem<WorkerPool[]>('worker_pools', DEFAULT_WORKER_POOLS);
+  }
+
+  public getWorkerPool(id: string): WorkerPool | undefined {
+    return this.getWorkerPools().find(p => p.id === id);
+  }
+
+  public saveWorkerPool(pool: WorkerPool): void {
+    const pools = this.getWorkerPools();
+    const index = pools.findIndex(p => p.id === pool.id);
+    if (index >= 0) {
+      pools[index] = { ...pool, updatedAt: new Date().toISOString() };
+    } else {
+      pools.push({ ...pool, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+    }
+    this.setItem('worker_pools', pools);
+  }
+
+  public deleteWorkerPool(id: string): void {
+    const pools = this.getWorkerPools().filter(p => p.id !== id);
+    this.setItem('worker_pools', pools);
   }
 
   // --- JOBS & QUEUE ---

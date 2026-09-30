@@ -69,14 +69,89 @@ export interface PipelineVariable {
   description?: string;
 }
 
+export type TabRuntimeStatus = 
+  | 'idle' 
+  | 'reserved' 
+  | 'busy' 
+  | 'waiting' 
+  | 'missing' 
+  | 'error' 
+  | 'offline';
+
+export interface SavedTab {
+  id: string; // e.g. "tab-chatgpt-enh-1"
+  browserId: string; // references ChromeProfile.id
+  friendlyName: string; // e.g. "Enhance 01", "Facebook Prompt"
+  expectedUrl: string; // e.g. "https://chatgpt.com"
+  conversationUrl?: string; // Optional pinned ChatGPT conversation URL
+  pageTitle?: string;
+  role?: string; // e.g. 'enhancement' | 'prompt' | 'hero' | 'tools' | 'publishing'
+  runtimeTargetId?: string; // Real Chrome CDP target ID
+  status: TabRuntimeStatus;
+  currentJobId?: string;
+  currentAction?: string;
+  activeImageName?: string;
+  lastSeen?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkerPoolMember {
+  browserId: string;
+  savedTabId: string;
+  enabled: boolean;
+  priority: number;
+  status: 'idle' | 'busy' | 'offline' | 'error';
+}
+
 export interface WorkerPool {
   id: string;
   name: string;
   description?: string;
-  memberProfileIds: string[];
+  members: WorkerPoolMember[];
+  memberProfileIds?: string[]; // backwards-compat
   concurrencyLimit?: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export type JobActionState = 
+  | 'Waiting for Browser'
+  | 'Finding Tab'
+  | 'Opening Tab'
+  | 'Uploading Image'
+  | 'Submitting Prompt'
+  | 'Waiting for ChatGPT'
+  | 'Generation In Progress'
+  | 'Result Detected'
+  | 'Downloading'
+  | 'Verifying Download'
+  | 'Saving File'
+  | 'Completed'
+  | 'Retrying'
+  | 'Failed';
+
+export interface PipelineJob {
+  jobId: string;
+  pipelineRunId: string;
+  stepId: string;
+  propertyId: string;
+  propertyName?: string;
+  inputId: string;
+  inputName?: string;
+  inputUrl?: string;
+  browserId?: string;
+  savedTabId?: string;
+  tabFriendlyName?: string;
+  workerPoolId?: string;
+  status: 'queued' | 'running' | 'completed' | 'failed' | 'retrying' | 'paused';
+  startedAt?: string;
+  completedAt?: string;
+  attempt: number;
+  maxAttempts: number;
+  currentAction: JobActionState;
+  output?: any;
+  error?: string;
 }
 
 export interface BrowserTabTarget {

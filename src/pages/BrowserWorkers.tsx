@@ -14,13 +14,15 @@ import {
   FiTag,
   FiSliders,
   FiCheck,
-  FiGlobe
+  FiGlobe,
+  FiLayers
 } from 'react-icons/fi';
 import { useApp } from '../context/AppContext';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { GlassModal } from '../components/common/GlassModal';
 import { AppDropdown } from '../components/common/AppDropdown';
 import { AddBrowserModal } from '../components/browser/AddBrowserModal';
+import { TabManagerModal } from '../components/browser/TabManagerModal';
 import { ChromeProfile, AutomationWorker } from '../types';
 import { openclawClient } from '../services/openclawClient';
 import { db } from '../services/storage';
@@ -38,6 +40,7 @@ export const BrowserWorkers: React.FC = () => {
 
   // Modals state
   const [isAddBrowserOpen, setIsAddBrowserOpen] = useState(false);
+  const [tabManagingProfile, setTabManagingProfile] = useState<ChromeProfile | null>(null);
   const [renamingProfile, setRenamingProfile] = useState<ChromeProfile | null>(null);
   const [newFriendlyName, setNewFriendlyName] = useState('');
   const [newLoginUrl, setNewLoginUrl] = useState('');
@@ -286,17 +289,82 @@ export const BrowserWorkers: React.FC = () => {
                         </span>
                       </div>
                     )}
+                    {/* Saved & Active Tabs Status */}
+                    {(() => {
+                      const profileTabs = db.getSavedTabs(prof.id);
+                      const busyTabs = profileTabs.filter(t => t.status === 'busy');
+                      return (
+                        <div className="mt-3 pt-2.5 border-t border-neutral-100 dark:border-neutral-800/80 space-y-1.5">
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="font-semibold text-neutral-600 dark:text-neutral-400">
+                              {busyTabs.length > 0 ? (
+                                <span className="text-blue-500 font-bold flex items-center gap-1">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                                  Active Tabs ({busyTabs.length} Busy)
+                                </span>
+                              ) : (
+                                <span>Saved Tabs ({profileTabs.length})</span>
+                              )}
+                            </span>
+                            <button
+                              onClick={() => setTabManagingProfile(prof)}
+                              className="text-[10px] text-red-500 font-semibold hover:underline"
+                            >
+                              Configure
+                            </button>
+                          </div>
+
+                          <div className="space-y-1">
+                            {profileTabs.length === 0 ? (
+                              <div className="text-[10.5px] text-neutral-400 italic">
+                                No tabs attached yet. Click "Manage Tabs" to link ChatGPT tabs.
+                              </div>
+                            ) : (
+                              profileTabs.slice(0, 3).map(tab => (
+                                <div 
+                                  key={tab.id} 
+                                  className={`flex items-center justify-between text-[11px] px-2 py-1 rounded-lg ${
+                                    tab.status === 'busy' 
+                                      ? 'bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400' 
+                                      : 'bg-neutral-50 dark:bg-neutral-800/60 text-neutral-700 dark:text-neutral-300'
+                                  }`}
+                                >
+                                  <span className="font-medium truncate max-w-[140px]">{tab.friendlyName}</span>
+                                  {tab.status === 'busy' ? (
+                                    <span className="text-[10px] font-semibold truncate max-w-[130px]">
+                                      {tab.currentAction || 'Generating'} {tab.activeImageName ? `• ${tab.activeImageName}` : ''}
+                                    </span>
+                                  ) : (
+                                    <span className="text-[10px] text-neutral-400 capitalize">{tab.status}</span>
+                                  )}
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Actions & Toolbar */}
                   <div className="pt-3 border-t border-neutral-100 dark:border-neutral-800/80 flex items-center justify-between gap-2">
-                    <button
-                      onClick={() => handleOpenBrowser(prof)}
-                      className="btn-primary-red text-xs py-1 px-3 flex items-center gap-1.5"
-                    >
-                      <FiExternalLink className="w-3 h-3" />
-                      <span>Open Browser</span>
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => handleOpenBrowser(prof)}
+                        className="btn-primary-red text-xs py-1 px-2.5 flex items-center gap-1.5"
+                      >
+                        <FiExternalLink className="w-3 h-3" />
+                        <span>Open Browser</span>
+                      </button>
+
+                      <button
+                        onClick={() => setTabManagingProfile(prof)}
+                        className="px-2.5 py-1 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-700 flex items-center gap-1.5 transition-all shadow-sm"
+                      >
+                        <FiLayers className="w-3 h-3 text-red-500" />
+                        <span>Manage Tabs</span>
+                      </button>
+                    </div>
 
                     <div className="flex items-center gap-1">
                       <button
@@ -309,27 +377,11 @@ export const BrowserWorkers: React.FC = () => {
                       </button>
 
                       <button
-                        onClick={() => openPurposeModal(prof)}
-                        title="Assign Purpose"
-                        className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-                      >
-                        <FiTag className="w-3.5 h-3.5" />
-                      </button>
-
-                      <button
                         onClick={() => openRenameModal(prof)}
                         title="Rename Browser"
                         className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                       >
                         <FiEdit2 className="w-3.5 h-3.5" />
-                      </button>
-
-                      <button
-                        onClick={() => setAdvancedProfile(prof)}
-                        title="Advanced Details"
-                        className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-                      >
-                        <FiSliders className="w-3.5 h-3.5" />
                       </button>
 
                       <button
@@ -671,6 +723,14 @@ export const BrowserWorkers: React.FC = () => {
           </div>
         </GlassModal>
       )}
+
+      {/* Tab Manager Modal */}
+      <TabManagerModal
+        isOpen={Boolean(tabManagingProfile)}
+        profile={tabManagingProfile}
+        onClose={() => setTabManagingProfile(null)}
+        onUpdate={refreshProfiles}
+      />
     </div>
   );
 };
