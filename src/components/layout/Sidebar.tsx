@@ -65,7 +65,7 @@ export const Sidebar: React.FC = () => {
       title: 'Automation',
       items: [
         { id: 'automation', label: 'Automation Center', icon: FiCpu },
-        { id: 'processes', label: 'Processes', icon: FiGitBranch, badge: activeRunsCount > 0 ? activeRunsCount : undefined },
+        { id: 'pipelines', label: 'Pipelines', icon: FiGitBranch, badge: activeRunsCount > 0 ? activeRunsCount : undefined },
         { id: 'browser_workers', label: 'Browser Workers', icon: FiLayers, badge: busyWorkersCount > 0 ? busyWorkersCount : undefined },
         { id: 'properties_link', label: 'Properties Link', icon: FiLink }
       ]

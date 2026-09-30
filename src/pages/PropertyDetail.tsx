@@ -24,6 +24,8 @@ import { PropertyImage, Process } from '../types';
 import { db } from '../services/storage';
 import { automationEngine } from '../services/automationEngine';
 import { processEngine } from '../services/processEngine';
+import { pipelineEngine } from '../services/pipelineEngine';
+import { Pipeline } from '../types/pipeline';
 
 export const PropertyDetail: React.FC = () => {
   const { 
@@ -33,6 +35,7 @@ export const PropertyDetail: React.FC = () => {
     refreshProperties,
     processes,
     openProcessRun,
+    openPipelineBuilder,
     jobs 
   } = useApp();
 
@@ -110,6 +113,24 @@ export const PropertyDetail: React.FC = () => {
     addNotification('info', 'Photo Removed', 'Image removed from workspace.');
   };
 
+  const handleRunPipeline = (pipeId: string) => {
+    try {
+      const run = pipelineEngine.executePipeline(pipeId, {
+        property,
+        propertyId: property.id,
+        images: images || [],
+        title: property.projectName
+      });
+      addNotification('success', 'Pipeline Started', `Executing pipeline graph on ${property.projectName}`);
+      setIsProcessModalOpen(false);
+      if (openPipelineBuilder) {
+        openPipelineBuilder(pipeId);
+      }
+    } catch (e: any) {
+      alert(e.message || 'Could not start pipeline.');
+    }
+  };
+
   const handleRunProcess = async (processId: string) => {
     try {
       const run = await processEngine.startProcess(processId, property.id);
@@ -122,6 +143,12 @@ export const PropertyDetail: React.FC = () => {
   };
 
   const handleRunDefaultProcess = async () => {
+    const pipelines = pipelineEngine.getPipelines();
+    const defaultPipe = pipelines.find(p => p.id === 'pipe-img-enh-loop') || pipelines[0];
+    if (defaultPipe) {
+      handleRunPipeline(defaultPipe.id);
+      return;
+    }
     const defaultProc = processes.find(p => p.id === 'proc-img-enh') || processes[0];
     if (!defaultProc) return;
     const validation = processEngine.validateProcess(defaultProc.id, property.id);
@@ -569,66 +596,57 @@ export const PropertyDetail: React.FC = () => {
               </button>
             </div>
 
-            {/* List of Processes with Readiness State */}
+            {/* List of Compatible Dynamic Pipelines */}
             <div className="space-y-2.5 overflow-y-auto pr-1 flex-1">
-              {processes.filter(p => !p.isArchived).map(proc => {
-                const validation = processEngine.validateProcess(proc.id, property.id);
-                return (
-                  <div 
-                    key={proc.id} 
-                    className="p-4 rounded-xl glass-card border border-neutral-200 dark:border-neutral-800 space-y-2.5"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-xs text-neutral-900 dark:text-neutral-100">
-                            {proc.name}
-                          </h4>
-                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-rose-500/10 text-rose-500 font-medium">
-                            {proc.steps.length} Steps
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5 leading-relaxed">
-                          {proc.description}
-                        </p>
+              <div className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">
+                Dynamic Pipelines
+              </div>
+              {pipelineEngine.getPipelines().filter(p => {
+                const t = p.inputSchema?.type;
+                return !t || t === 'property' || t === 'images' || t === 'none';
+              }).map(pipe => (
+                <div 
+                  key={pipe.id} 
+                  className="p-4 rounded-xl glass-card border border-neutral-200 dark:border-neutral-800 space-y-2.5"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-bold text-xs text-neutral-900 dark:text-neutral-100">
+                          {pipe.name}
+                        </h4>
+                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-600 dark:text-purple-400 font-medium">
+                          {pipe.nodes.length} Nodes
+                        </span>
+                        <span className="font-mono text-[10px] text-neutral-400">
+                          {pipe.version}
+                        </span>
                       </div>
-
-                      <button
-                        onClick={() => handleRunProcess(proc.id)}
-                        disabled={!validation.isValid}
-                        className="btn-primary-red !h-7 !text-[11px] shrink-0 disabled:opacity-40"
-                      >
-                        <FiPlay className="w-3 h-3" />
-                        <span>Start</span>
-                      </button>
+                      <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5 leading-relaxed">
+                        {pipe.description}
+                      </p>
                     </div>
 
-                    {/* Pre-flight readiness check */}
-                    <div className={`p-2 rounded-lg text-[11px] flex items-center justify-between ${
-                      validation.isValid 
-                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' 
-                        : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
-                    }`}>
-                      <div className="flex items-center gap-1.5">
-                        {validation.isValid ? (
-                          <>
-                            <FiCheckCircle className="w-3.5 h-3.5 shrink-0" />
-                            <span>Ready to execute ({images.length} photos in workspace)</span>
-                          </>
-                        ) : (
-                          <>
-                            <FiAlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                            <span>{validation.errors[0] || 'Prerequisites not met'}</span>
-                          </>
-                        )}
-                      </div>
-                      <span className="font-mono text-[10px] uppercase font-semibold">
-                        {validation.isValid ? 'Ready' : 'Not Ready'}
-                      </span>
-                    </div>
+                    <button
+                      onClick={() => handleRunPipeline(pipe.id)}
+                      className="btn-primary-red !h-7 !text-[11px] shrink-0"
+                    >
+                      <FiPlay className="w-3 h-3" />
+                      <span>Start Pipeline</span>
+                    </button>
                   </div>
-                );
-              })}
+
+                  <div className="p-2 rounded-lg text-[11px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <FiCheckCircle className="w-3.5 h-3.5 shrink-0" />
+                      <span>Compatible with property context ({images.length} photos ready)</span>
+                    </div>
+                    <span className="font-mono text-[10px] uppercase font-semibold">
+                      Compatible
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
 
             <div className="pt-3 border-t border-neutral-200 dark:border-neutral-800 flex justify-end">

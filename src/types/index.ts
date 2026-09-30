@@ -473,3 +473,6 @@ export interface PropertyLinkGroup {
   updatedAt: string;
 }
 
+// Re-export Pipeline Graph Engine Types
+export * from './pipeline';
+

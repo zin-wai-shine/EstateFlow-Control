@@ -25,6 +25,8 @@ export type NavigationPage =
   | 'properties'
   | 'property_detail'
   | 'automation'
+  | 'pipelines'
+  | 'pipeline_builder'
   | 'processes'
   | 'process_builder'
   | 'browser_workers'
@@ -50,6 +52,7 @@ interface AppContextType {
   selectedProcessId: string | null;
   setSelectedProcessId: (processId: string | null) => void;
   openProcessBuilder: (processId?: string) => void;
+  openPipelineBuilder: (pipelineId?: string) => void;
 
   // Theme
   theme: ThemeMode;
@@ -197,9 +200,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setHealth(data);
   }, []);
 
+  const openPipelineBuilder = (pipelineId?: string) => {
+    setSelectedProcessId(pipelineId || null);
+    setActivePage('pipeline_builder');
+  };
+
   const openProcessBuilder = (processId?: string) => {
     setSelectedProcessId(processId || null);
-    setActivePage('process_builder');
+    setActivePage('pipeline_builder');
   };
 
   const openProcessRun = (runId: string) => {
@@ -318,6 +326,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         selectedProcessId,
         setSelectedProcessId,
         openProcessBuilder,
+        openPipelineBuilder,
         theme,
         setTheme,
         properties,

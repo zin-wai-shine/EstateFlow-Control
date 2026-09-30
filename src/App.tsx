@@ -7,6 +7,8 @@ import { Dashboard } from './pages/Dashboard';
 import { Properties } from './pages/Properties';
 import { PropertyDetail } from './pages/PropertyDetail';
 import { AutomationCenter } from './pages/AutomationCenter';
+import { Pipelines } from './pages/Pipelines';
+import { PipelineBuilder } from './pages/PipelineBuilder';
 import { Processes } from './pages/Processes';
 import { ProcessBuilder } from './pages/ProcessBuilder';
 import { ProcessRunModal } from './pages/ProcessRunModal';
@@ -43,10 +45,14 @@ const AppContent: React.FC = () => {
         return <PropertyDetail />;
       case 'automation':
         return <AutomationCenter />;
+      case 'pipelines':
+        return <Pipelines />;
+      case 'pipeline_builder':
+        return <PipelineBuilder />;
       case 'processes':
-        return <Processes />;
+        return <Pipelines />;
       case 'process_builder':
-        return <ProcessBuilder />;
+        return <PipelineBuilder />;
       case 'browser_workers':
         return <BrowserWorkers />;
       case 'properties_link':
