@@ -18,6 +18,7 @@ import { instantiateNode } from '../services/nodeRegistry';
 import { useApp } from '../context/AppContext';
 import { NodeLibrary } from '../components/pipeline/NodeLibrary';
 import { PipelineCanvas } from '../components/pipeline/PipelineCanvas';
+import { PipelineStepsFlow } from '../components/pipeline/PipelineStepsFlow';
 import { NodeSettingsPanel } from '../components/pipeline/NodeSettingsPanel';
 import { SmartBuildModal } from '../components/pipeline/SmartBuildModal';
 import { RunPipelineModal } from '../components/pipeline/RunPipelineModal';
@@ -38,7 +39,9 @@ import {
   FiLayers,
   FiFileText,
   FiCheck,
-  FiX
+  FiX,
+  FiList,
+  FiGitCommit
 } from 'react-icons/fi';
 
 export const PipelineBuilder: React.FC = () => {
@@ -60,6 +63,7 @@ export const PipelineBuilder: React.FC = () => {
 
   // Selection & History State
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'flow' | 'canvas'>('flow');
   const [history, setHistory] = useState<Pipeline[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
   const isRecordingHistory = useRef(true);
@@ -341,6 +345,35 @@ export const PipelineBuilder: React.FC = () => {
 
         {/* Right Toolbar Actions */}
         <div className="flex items-center gap-2">
+          {/* View Mode Toggle: Steps Flow vs Canvas */}
+          <div className="flex items-center bg-neutral-100 dark:bg-neutral-800 p-0.5 rounded-xl border border-neutral-200/80 dark:border-neutral-700/60 mr-1">
+            <button
+              onClick={() => setViewMode('flow')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                viewMode === 'flow'
+                  ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
+                  : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
+              }`}
+              title="Clean Step-by-Step Flow (Zero Wire Dragging)"
+            >
+              <FiList className="w-3.5 h-3.5 text-red-500" />
+              <span>Steps Flow</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold">Easy</span>
+            </button>
+            <button
+              onClick={() => setViewMode('canvas')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                viewMode === 'canvas'
+                  ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
+                  : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
+              }`}
+              title="Freeform Node Canvas"
+            >
+              <FiGitCommit className="w-3.5 h-3.5 text-purple-500" />
+              <span>Canvas</span>
+            </button>
+          </div>
+
           {/* Undo / Redo */}
           <div className="flex items-center gap-0.5 bg-neutral-100 dark:bg-neutral-800 rounded-xl p-0.5">
             <button
@@ -405,36 +438,65 @@ export const PipelineBuilder: React.FC = () => {
         {/* LEFT PANEL: Node Library */}
         <NodeLibrary onAddNode={handleAddNode} />
 
-        {/* CENTER PANEL: Pipeline Canvas */}
+        {/* CENTER PANEL: Flow View or Canvas */}
         <div className="flex-1 relative overflow-hidden flex flex-col">
-          <PipelineCanvas
-            nodes={pipeline.nodes}
-            edges={pipeline.edges}
-            selectedNodeId={selectedNodeId}
-            onSelectNode={(nodeId) => {
-              setSelectedNodeId(nodeId);
-              if (nodeId && (activeRun?.nodeRuns?.[nodeId] || activeRun?.nodeStates?.[nodeId])) {
+          {viewMode === 'flow' ? (
+            <PipelineStepsFlow
+              nodes={pipeline.nodes}
+              edges={pipeline.edges}
+              selectedNodeId={selectedNodeId}
+              onSelectNode={(nodeId) => {
+                setSelectedNodeId(nodeId);
+                if (nodeId && (activeRun?.nodeRuns?.[nodeId] || activeRun?.nodeStates?.[nodeId])) {
+                  setInspectingNodeRunId(nodeId);
+                }
+              }}
+              onUpdateNodes={handleUpdateNodes}
+              onUpdateEdges={handleUpdateEdges}
+              onDeleteNode={handleDeleteNode}
+              onDuplicateNode={handleDuplicateNode}
+              activeRun={activeRun}
+              onApproveNode={handleApproveNode}
+              onRetryNode={(nodeId) => {
+                if (activeRun) {
+                  handleLaunchRun(activeRun.id);
+                }
+              }}
+              onInspectNodeRun={(nodeId) => {
                 setInspectingNodeRunId(nodeId);
-              }
-            }}
-            onUpdateNodes={handleUpdateNodes}
-            onUpdateEdges={handleUpdateEdges}
-            onDeleteNode={handleDeleteNode}
-            onDuplicateNode={handleDuplicateNode}
-            activeRun={activeRun}
-            onApproveNode={handleApproveNode}
-            onRetryNode={(nodeId) => {
-              if (activeRun) {
-                // Resume node retry
-                handleLaunchRun(activeRun.id);
-              }
-            }}
-            onInspectNodeRun={(nodeId) => {
-              setInspectingNodeRunId(nodeId);
-              setIsDrawerOpen(true);
-              setDrawerTab('preview');
-            }}
-          />
+                setIsDrawerOpen(true);
+                setDrawerTab('preview');
+              }}
+            />
+          ) : (
+            <PipelineCanvas
+              nodes={pipeline.nodes}
+              edges={pipeline.edges}
+              selectedNodeId={selectedNodeId}
+              onSelectNode={(nodeId) => {
+                setSelectedNodeId(nodeId);
+                if (nodeId && (activeRun?.nodeRuns?.[nodeId] || activeRun?.nodeStates?.[nodeId])) {
+                  setInspectingNodeRunId(nodeId);
+                }
+              }}
+              onUpdateNodes={handleUpdateNodes}
+              onUpdateEdges={handleUpdateEdges}
+              onDeleteNode={handleDeleteNode}
+              onDuplicateNode={handleDuplicateNode}
+              activeRun={activeRun}
+              onApproveNode={handleApproveNode}
+              onRetryNode={(nodeId) => {
+                if (activeRun) {
+                  handleLaunchRun(activeRun.id);
+                }
+              }}
+              onInspectNodeRun={(nodeId) => {
+                setInspectingNodeRunId(nodeId);
+                setIsDrawerOpen(true);
+                setDrawerTab('preview');
+              }}
+            />
+          )}
 
           {/* Bottom Runtime / Validation Drawer */}
           <div className={`transition-all duration-200 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-t border-neutral-200 dark:border-neutral-800 z-20 flex flex-col ${

@@ -160,7 +160,7 @@ export const Pipelines: React.FC = () => {
                           p.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
     if (activeTab === 'templates') return matchesSearch && p.isTemplate;
-    if (activeTab === 'pipelines') return matchesSearch && matchesStatus && !p.isTemplate;
+    if (activeTab === 'pipelines') return matchesSearch && matchesStatus;
     return true;
   });
 
@@ -221,7 +221,7 @@ export const Pipelines: React.FC = () => {
                   : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
               }`}
             >
-              All Workflows ({pipelines.filter(p => !p.isTemplate).length})
+              All Workflows ({pipelines.length})
             </button>
             <button
               onClick={() => setActiveTab('templates')}
@@ -402,16 +402,25 @@ export const Pipelines: React.FC = () => {
                       {pipeline.description || 'Flexible pipeline graph.'}
                     </p>
 
+                    {/* Visual Step Path Preview */}
+                    <div className="mt-3.5 p-2.5 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800/80 flex items-center gap-1.5 overflow-x-auto text-[11px]">
+                      {pipeline.nodes.map((node, nIdx) => (
+                        <React.Fragment key={node.id}>
+                          <span className="px-2 py-0.5 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 font-medium whitespace-nowrap text-[10px]">
+                            {node.name}
+                          </span>
+                          {nIdx < pipeline.nodes.length - 1 && (
+                            <span className="text-neutral-400 shrink-0 text-[10px]">→</span>
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </div>
+
                     {/* Node and Graph Topology Badges */}
-                    <div className="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800/70 text-[11px] text-neutral-500 dark:text-neutral-400">
+                    <div className="flex flex-wrap items-center gap-2 mt-3 text-[11px] text-neutral-500 dark:text-neutral-400">
                       <span className="flex items-center gap-1 font-medium">
                         <FiSliders className="w-3 h-3 text-red-500" />
-                        {pipeline.nodes.length} Nodes
-                      </span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1 font-medium">
-                        <FiCornerDownRight className="w-3 h-3 text-blue-500" />
-                        {pipeline.edges.length} Connections
+                        {pipeline.nodes.length} Steps
                       </span>
                       {poolCount > 0 && (
                         <>
@@ -425,13 +434,13 @@ export const Pipelines: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Card Footer with Run and Edit Canvas */}
+                  {/* Card Footer with Run and Edit Flow */}
                   <div className="p-4 px-6 bg-neutral-50/60 dark:bg-neutral-900/60 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between">
                     <div className="text-[11px] text-neutral-400">
                       {pipeline.runCount > 0 ? (
-                        <span>{pipeline.successCount}/{pipeline.runCount} successful runs</span>
+                        <span>{pipeline.successCount}/{pipeline.runCount} runs</span>
                       ) : (
-                        <span>Never run</span>
+                        <span>Ready to run</span>
                       )}
                     </div>
 
@@ -440,13 +449,13 @@ export const Pipelines: React.FC = () => {
                         onClick={() => handleOpenBuilder(pipeline.id)}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 text-xs font-semibold hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
                       >
-                        <FiEdit3 className="w-3.5 h-3.5" />
-                        <span>Canvas</span>
+                        <FiSliders className="w-3.5 h-3.5" />
+                        <span>Edit Flow</span>
                       </button>
 
                       <button
                         onClick={() => setPipelineToRun(pipeline)}
-                        className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow-sm transition-all"
+                        className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm shadow-emerald-600/20 transition-all"
                       >
                         <FiPlay className="w-3.5 h-3.5 ml-0.5" />
                         <span>Run</span>

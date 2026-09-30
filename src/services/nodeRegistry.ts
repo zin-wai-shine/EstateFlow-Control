@@ -1080,3 +1080,107 @@ export function arePortsCompatible(sourceType: PortDataType, targetType: PortDat
 
   return false;
 }
+
+// High-Level Smart Step Templates for Simple Non-Confusing User Experience
+export interface SmartStepTemplate {
+  id: string;
+  type: string;
+  title: string;
+  subtitle: string;
+  category: NodeCategory;
+  badge: string;
+  iconName: string;
+  defaultConfig: Record<string, any>;
+  description: string;
+}
+
+export const SMART_STEP_TEMPLATES: SmartStepTemplate[] = [
+  {
+    id: 'step_photos',
+    type: 'input_property_images',
+    title: 'Property Photos',
+    subtitle: 'Feeds listing photos to the workflow',
+    category: 'input',
+    badge: 'Input',
+    iconName: 'FiImage',
+    defaultConfig: { imageCategoryFilter: 'all' },
+    description: 'Loads all original listing photos from the selected property.'
+  },
+  {
+    id: 'step_enhance',
+    type: 'flow_for_each',
+    title: 'AI Photo Enhancement',
+    subtitle: 'ChatGPT 4-Workers Concurrent Loop (4K)',
+    category: 'media',
+    badge: '4x Parallel',
+    iconName: 'FiZap',
+    defaultConfig: { workerPoolId: 'pool-enhancement', concurrencyLimit: 4, resolution: '4K' },
+    description: 'Uploads and enhances every listing photo through ChatGPT across 4 concurrent browser tabs.'
+  },
+  {
+    id: 'step_social_copy',
+    type: 'data_build_prompt',
+    title: 'Generate Social Copy',
+    subtitle: 'Facebook & TikTok marketing captions',
+    category: 'chat_ai',
+    badge: 'AI Writer',
+    iconName: 'FiEdit3',
+    defaultConfig: { targetPlatform: 'facebook' },
+    description: 'Generates high-converting marketing copy and hashtags from property details.'
+  },
+  {
+    id: 'step_watermark',
+    type: 'media_external_processor',
+    title: 'Watermark & Resize Tool',
+    subtitle: 'Processes photos via Post Studio',
+    category: 'media',
+    badge: 'Watermark',
+    iconName: 'FiLayers',
+    defaultConfig: { targetToolName: 'Post Studio / Watermark Website' },
+    description: 'Applies agency branding, watermark logo, and optimizes images for posting.'
+  },
+  {
+    id: 'step_hero',
+    type: 'media_hero_image',
+    title: 'Social Hero Graphic',
+    subtitle: '1:1 Square cover with copy & photos',
+    category: 'media',
+    badge: 'Creative',
+    iconName: 'FiStar',
+    defaultConfig: { heroAspectRatio: '1:1' },
+    description: 'Creates an eye-catching hero advertisement graphic combining copy and photos.'
+  },
+  {
+    id: 'step_approval',
+    type: 'flow_approval',
+    title: 'Review & Approval',
+    subtitle: 'Pauses workflow for one-click operator check',
+    category: 'flow',
+    badge: 'Checkpoint',
+    iconName: 'FiCheckCircle',
+    defaultConfig: {},
+    description: 'Holds the pipeline before publishing so an operator can review generated assets.'
+  },
+  {
+    id: 'step_publish',
+    type: 'output_publish',
+    title: 'Publish to Facebook',
+    subtitle: 'Direct post to Page & Marketplace',
+    category: 'output',
+    badge: 'Publishing',
+    iconName: 'FiSend',
+    defaultConfig: { destinationChannel: 'facebook_page' },
+    description: 'Publishes completed images, hero graphic, and copy directly to social media.'
+  },
+  {
+    id: 'step_browser_action',
+    type: 'browser_custom_action',
+    title: 'Custom Website Action',
+    subtitle: 'Automates actions on any target URL',
+    category: 'browser',
+    badge: 'Automation',
+    iconName: 'FiGlobe',
+    defaultConfig: { targetUrl: 'https://' },
+    description: 'Navigates to any external portal, fills forms, or triggers actions.'
+  }
+];

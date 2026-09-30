@@ -51,45 +51,39 @@ export const DEFAULT_WORKER_POOLS: WorkerPool[] = [
 // DEFAULT PIPELINES & TEMPLATES
 // ==========================================
 function buildImageEnhancementPipeline(): Pipeline {
-  const n1 = instantiateNode('input_property_images', { x: 80, y: 150 });
-  const n2 = instantiateNode('flow_for_each', { x: 380, y: 150 });
-  n2.config = { concurrencyLimit: 4, workerPoolId: 'pool-enhancement' };
+  const n1 = instantiateNode('input_property_images', { x: 100, y: 180 });
+  n1.name = 'Property Photos';
 
-  const n3 = instantiateNode('chat_upload_images', { x: 680, y: 150 });
-  const n4 = instantiateNode('chat_send_prompt', { x: 960, y: 150 });
-  const n5 = instantiateNode('chat_wait_response', { x: 1240, y: 150 });
-  const n6 = instantiateNode('chat_download_file', { x: 1520, y: 150 });
-  const n7 = instantiateNode('file_verify', { x: 1800, y: 150 });
-  const n8 = instantiateNode('file_save', { x: 2080, y: 150 });
-  const n9 = instantiateNode('output_mark_complete', { x: 2360, y: 150 });
+  const n2 = instantiateNode('flow_for_each', { x: 420, y: 180 });
+  n2.name = 'AI Photo Enhancement';
+  n2.config = { concurrencyLimit: 4, workerPoolId: 'pool-enhancement', resolution: '4K' };
+
+  const n3 = instantiateNode('media_external_processor', { x: 740, y: 180 });
+  n3.name = 'Watermark & Resize Tool';
+  n3.config = { targetToolName: 'Post Studio / Watermark Website' };
+
+  const n4 = instantiateNode('output_mark_complete', { x: 1060, y: 180 });
+  n4.name = 'Save Assets & Finish';
 
   const edges: PipelineEdge[] = [
-    { id: 'e1', sourceNodeId: n1.id, sourcePortId: 'images_out', targetNodeId: n2.id, targetPortId: 'items_in' },
-    { id: 'e2', sourceNodeId: n2.id, sourcePortId: 'item_out', targetNodeId: n3.id, targetPortId: 'images_in' },
-    { id: 'e3', sourceNodeId: n3.id, sourcePortId: 'tab_out', targetNodeId: n4.id, targetPortId: 'tab_in' },
-    { id: 'e4', sourceNodeId: n4.id, sourcePortId: 'tab_out', targetNodeId: n5.id, targetPortId: 'tab_in' },
-    { id: 'e5', sourceNodeId: n5.id, sourcePortId: 'tab_out', targetNodeId: n6.id, targetPortId: 'tab_in' },
-    { id: 'e6', sourceNodeId: n6.id, sourcePortId: 'file_out', targetNodeId: n7.id, targetPortId: 'file_in' },
-    { id: 'e7', sourceNodeId: n7.id, sourcePortId: 'file_out', targetNodeId: n8.id, targetPortId: 'file_in' },
-    { id: 'e8', sourceNodeId: n8.id, sourcePortId: 'saved_out', targetNodeId: n9.id, targetPortId: 'final_in' }
+    { id: 'e1', sourceNodeId: n1.id, sourcePortId: n1.outputs[0].id, targetNodeId: n2.id, targetPortId: n2.inputs[0].id },
+    { id: 'e2', sourceNodeId: n2.id, sourcePortId: n2.outputs[0].id, targetNodeId: n3.id, targetPortId: n3.inputs[0].id },
+    { id: 'e3', sourceNodeId: n3.id, sourcePortId: n3.outputs[0].id, targetNodeId: n4.id, targetPortId: n4.inputs[0].id }
   ];
 
   return {
     id: 'pipe-img-enh-loop',
-    name: 'Parallel Photo Enhancement Loop',
-    description: 'Dynamic 4-worker concurrent loop processing all property photos through persistent ChatGPT sessions',
+    name: 'Photo Enhancement & Watermark',
+    description: 'Loops all property photos through 4 parallel ChatGPT enhancement workers, then applies watermark and saves assets',
     version: 'v1.0',
     status: 'active',
-    nodes: [n1, n2, n3, n4, n5, n6, n7, n8, n9],
+    nodes: [n1, n2, n3, n4],
     edges,
-    variables: [
-      { key: 'targetResolution', value: '4K', description: 'Target upscaled output size' }
-    ],
+    variables: [{ key: 'targetResolution', value: '4K', description: 'Target upscaled output size' }],
     inputSchema: { type: 'images', label: 'Property Photos Collection' },
-    outputSchema: { fields: ['enhancedImages', 'savedAssetCount'] },
+    outputSchema: { fields: ['enhancedImages', 'watermarkedImages'] },
     settings: { maxParallelJobs: 4, defaultTimeoutSeconds: 180, errorStrategy: 'retry' },
-    isTemplate: true,
-    templateCategory: 'Enhancement',
+    isTemplate: false,
     runCount: 14,
     successCount: 14,
     failureCount: 0,
@@ -100,83 +94,93 @@ function buildImageEnhancementPipeline(): Pipeline {
 }
 
 function buildParallelSocialPipeline(): Pipeline {
-  const nStart = instantiateNode('input_property', { x: 60, y: 260 });
-  const nParallel = instantiateNode('flow_parallel', { x: 340, y: 260 });
-  nParallel.config = { activeBranchesCount: 3 };
+  const nStart = instantiateNode('input_property', { x: 80, y: 220 });
+  nStart.name = 'Property Details';
 
-  // Branch 1: Images
-  const nImgIn = instantiateNode('input_property_images', { x: 620, y: 100 });
-  const nLoop = instantiateNode('flow_for_each', { x: 900, y: 100 });
-  nLoop.config = { concurrencyLimit: 4, workerPoolId: 'pool-enhancement' };
-  const nChat = instantiateNode('chat_send_prompt', { x: 1180, y: 100 });
+  const nEnhance = instantiateNode('flow_for_each', { x: 380, y: 120 });
+  nEnhance.name = 'AI Photo Enhancement (4x)';
+  nEnhance.config = { concurrencyLimit: 4, workerPoolId: 'pool-enhancement' };
 
-  // Branch 2: Facebook Prompt
-  const nFbPrompt = instantiateNode('data_build_prompt', { x: 620, y: 290 });
-  nFbPrompt.config = { targetPlatform: 'facebook' };
-  const nFbSend = instantiateNode('chat_send_prompt', { x: 900, y: 290 });
-  const nFbCap = instantiateNode('chat_capture_response', { x: 1180, y: 290 });
+  const nCopy = instantiateNode('data_build_prompt', { x: 380, y: 320 });
+  nCopy.name = 'Generate Social Copy';
+  nCopy.config = { targetPlatform: 'facebook' };
 
-  // Branch 3: TikTok Prompt
-  const nTtPrompt = instantiateNode('data_build_prompt', { x: 620, y: 470 });
-  nTtPrompt.config = { targetPlatform: 'tiktok' };
-  const nTtSend = instantiateNode('chat_send_prompt', { x: 900, y: 470 });
-  const nTtCap = instantiateNode('chat_capture_response', { x: 1180, y: 470 });
+  const nHero = instantiateNode('media_hero_image', { x: 700, y: 220 });
+  nHero.name = 'Social Hero Graphic';
+  nHero.config = { heroAspectRatio: '1:1' };
 
-  // Join & Hero
-  const nJoin = instantiateNode('flow_join', { x: 1460, y: 260 });
-  nJoin.config = { joinStrategy: 'wait_for_all' };
+  const nApproval = instantiateNode('flow_approval', { x: 980, y: 220 });
+  nApproval.name = 'Review & Approval';
 
-  const nHero = instantiateNode('media_hero_image', { x: 1740, y: 260 });
-  const nApproval = instantiateNode('flow_approval', { x: 2020, y: 260 });
-  const nPublish = instantiateNode('output_publish', { x: 2300, y: 260 });
-  const nComplete = instantiateNode('output_mark_complete', { x: 2580, y: 260 });
+  const nPublish = instantiateNode('output_publish', { x: 1260, y: 220 });
+  nPublish.name = 'Publish to Facebook';
 
   const edges: PipelineEdge[] = [
-    { id: 'ep1', sourceNodeId: nStart.id, sourcePortId: 'prop_out', targetNodeId: nParallel.id, targetPortId: 'trigger_in' },
-    { id: 'ep2', sourceNodeId: nParallel.id, sourcePortId: 'branch1_out', targetNodeId: nImgIn.id, targetPortId: 'prop_in' },
-    { id: 'ep3', sourceNodeId: nParallel.id, sourcePortId: 'branch2_out', targetNodeId: nFbPrompt.id, targetPortId: 'prop_in' },
-    { id: 'ep4', sourceNodeId: nParallel.id, sourcePortId: 'branch3_out', targetNodeId: nTtPrompt.id, targetPortId: 'prop_in' },
-
-    { id: 'ep5', sourceNodeId: nImgIn.id, sourcePortId: 'images_out', targetNodeId: nLoop.id, targetPortId: 'items_in' },
-    { id: 'ep6', sourceNodeId: nLoop.id, sourcePortId: 'item_out', targetNodeId: nChat.id, targetPortId: 'prompt_in' },
-    { id: 'ep7', sourceNodeId: nChat.id, sourcePortId: 'tab_out', targetNodeId: nJoin.id, targetPortId: 'branch1_in' },
-
-    { id: 'ep8', sourceNodeId: nFbPrompt.id, sourcePortId: 'prompt_out', targetNodeId: nFbSend.id, targetPortId: 'prompt_in' },
-    { id: 'ep9', sourceNodeId: nFbSend.id, sourcePortId: 'tab_out', targetNodeId: nFbCap.id, targetPortId: 'tab_in' },
-    { id: 'ep10', sourceNodeId: nFbCap.id, sourcePortId: 'prompt_out', targetNodeId: nJoin.id, targetPortId: 'branch2_in' },
-
-    { id: 'ep11', sourceNodeId: nTtPrompt.id, sourcePortId: 'prompt_out', targetNodeId: nTtSend.id, targetPortId: 'prompt_in' },
-    { id: 'ep12', sourceNodeId: nTtSend.id, sourcePortId: 'tab_out', targetNodeId: nTtCap.id, targetPortId: 'tab_in' },
-    { id: 'ep13', sourceNodeId: nTtCap.id, sourcePortId: 'prompt_out', targetNodeId: nJoin.id, targetPortId: 'branch3_in' },
-
-    { id: 'ep14', sourceNodeId: nJoin.id, sourcePortId: 'join_out', targetNodeId: nHero.id, targetPortId: 'main_img_in' },
-    { id: 'ep15', sourceNodeId: nHero.id, sourcePortId: 'hero_out', targetNodeId: nApproval.id, targetPortId: 'items_in' },
-    { id: 'ep16', sourceNodeId: nApproval.id, sourcePortId: 'approved_out', targetNodeId: nPublish.id, targetPortId: 'hero_in' },
-    { id: 'ep17', sourceNodeId: nPublish.id, sourcePortId: 'post_url_out', targetNodeId: nComplete.id, targetPortId: 'final_in' }
+    { id: 'ep1', sourceNodeId: nStart.id, sourcePortId: nStart.outputs[0].id, targetNodeId: nEnhance.id, targetPortId: nEnhance.inputs[0].id },
+    { id: 'ep2', sourceNodeId: nStart.id, sourcePortId: nStart.outputs[0].id, targetNodeId: nCopy.id, targetPortId: nCopy.inputs[0].id },
+    { id: 'ep3', sourceNodeId: nEnhance.id, sourcePortId: nEnhance.outputs[0].id, targetNodeId: nHero.id, targetPortId: nHero.inputs[0].id },
+    { id: 'ep4', sourceNodeId: nCopy.id, sourcePortId: nCopy.outputs[0].id, targetNodeId: nHero.id, targetPortId: nHero.inputs[1]?.id || nHero.inputs[0].id },
+    { id: 'ep5', sourceNodeId: nHero.id, sourcePortId: nHero.outputs[0].id, targetNodeId: nApproval.id, targetPortId: nApproval.inputs[0].id },
+    { id: 'ep6', sourceNodeId: nApproval.id, sourcePortId: nApproval.outputs[0].id, targetNodeId: nPublish.id, targetPortId: nPublish.inputs[0].id }
   ];
 
   return {
     id: 'pipe-parallel-social',
-    name: 'Parallel Multi-Channel Publishing Pipeline',
-    description: 'Concurrently runs photo enhancement and social prompt generation, then merges at Hero graphics with manual sign-off',
+    name: 'Complete Social Posting (Parallel)',
+    description: 'Concurrently runs photo enhancement and social copywriting, creates hero graphic, pauses for approval, and publishes',
     version: 'v1.0',
     status: 'active',
-    nodes: [nStart, nParallel, nImgIn, nLoop, nChat, nFbPrompt, nFbSend, nFbCap, nTtPrompt, nTtSend, nTtCap, nJoin, nHero, nApproval, nPublish, nComplete],
+    nodes: [nStart, nEnhance, nCopy, nHero, nApproval, nPublish],
     edges,
-    variables: [
-      { key: 'campaignTag', value: 'Q3_Luxury_Promotion' }
-    ],
+    variables: [{ key: 'campaignTag', value: 'Q3_Luxury_Promotion' }],
     inputSchema: { type: 'property', label: 'Listing Property' },
     outputSchema: { fields: ['heroGraphic', 'facebookPost', 'tiktokScript'] },
-    settings: { maxParallelJobs: 6, defaultTimeoutSeconds: 300, errorStrategy: 'stop' },
-    isTemplate: true,
-    templateCategory: 'Publishing',
+    settings: { maxParallelJobs: 4, defaultTimeoutSeconds: 300, errorStrategy: 'stop' },
+    isTemplate: false,
     runCount: 8,
     successCount: 7,
     failureCount: 1,
     lastRunAt: new Date(Date.now() - 3600000 * 18).toISOString(),
     createdAt: new Date(Date.now() - 3600000 * 24 * 7).toISOString(),
     updatedAt: new Date(Date.now() - 3600000 * 18).toISOString()
+  };
+}
+
+function buildCopywritingPipeline(): Pipeline {
+  const n1 = instantiateNode('input_property', { x: 100, y: 180 });
+  n1.name = 'Property Details';
+
+  const n2 = instantiateNode('data_build_prompt', { x: 420, y: 180 });
+  n2.name = 'Generate Social Copy';
+  n2.config = { targetPlatform: 'facebook' };
+
+  const n3 = instantiateNode('flow_approval', { x: 740, y: 180 });
+  n3.name = 'Review & Save Copy';
+
+  const edges: PipelineEdge[] = [
+    { id: 'ec1', sourceNodeId: n1.id, sourcePortId: n1.outputs[0].id, targetNodeId: n2.id, targetPortId: n2.inputs[0].id },
+    { id: 'ec2', sourceNodeId: n2.id, sourcePortId: n2.outputs[0].id, targetNodeId: n3.id, targetPortId: n3.inputs[0].id }
+  ];
+
+  return {
+    id: 'pipe-copywriting-fast',
+    name: 'Social Copywriting Fast-Track',
+    description: 'Instant AI listing copywriting for Facebook & TikTok with hashtags and pricing highlights',
+    version: 'v1.0',
+    status: 'active',
+    nodes: [n1, n2, n3],
+    edges,
+    variables: [],
+    inputSchema: { type: 'property', label: 'Listing Property' },
+    outputSchema: { fields: ['facebookPost', 'tiktokScript'] },
+    settings: { maxParallelJobs: 2, defaultTimeoutSeconds: 60, errorStrategy: 'retry' },
+    isTemplate: false,
+    runCount: 5,
+    successCount: 5,
+    failureCount: 0,
+    lastRunAt: new Date(Date.now() - 3600000 * 12).toISOString(),
+    createdAt: new Date(Date.now() - 3600000 * 24 * 3).toISOString(),
+    updatedAt: new Date(Date.now() - 3600000 * 12).toISOString()
   };
 }
 
@@ -205,14 +209,15 @@ export function buildBlankPipeline(name = 'New Custom Pipeline'): Pipeline {
 
 export const DEFAULT_PIPELINES: Pipeline[] = [
   buildImageEnhancementPipeline(),
-  buildParallelSocialPipeline()
+  buildParallelSocialPipeline(),
+  buildCopywritingPipeline()
 ];
 
 // ==========================================
 // STORAGE & RUNTIME PIPELINE ENGINE
 // ==========================================
 class PipelineEngine {
-  private STORAGE_KEY_PIPELINES = 'estateflow_pipelines_v2';
+  private STORAGE_KEY_PIPELINES = 'estateflow_pipelines_v3';
   private STORAGE_KEY_RUNS = 'estateflow_pipeline_runs_v2';
   private STORAGE_KEY_POOLS = 'estateflow_worker_pools_v2';
 
